@@ -1,4 +1,4 @@
-Player = function(id) {
+Player = function (id) {
   const self = Entity();
   self.purpose = "player";
   let races = ["Elf", "Human"];
@@ -31,7 +31,7 @@ Player = function(id) {
   self.deadTimer = 0;
   //closes
   self.armor = {
-    body: "ArchDruidCore", // armor[Math.floor(Math.random() * armor.length)],
+    body: armor[Math.floor(Math.random() * armor.length)],
     boots: "None",
     helmet: helmets[Math.floor(Math.random() * helmets.length)],
     weapon: "None"
@@ -46,7 +46,7 @@ Player = function(id) {
   //animation
   self.spriteAnimeCounter = 0;
   const super_update = self.update;
-  self.update = function() {
+  self.update = function () {
     self.updateSpd();
     super_update();
     if (self.pressingAttack) {
@@ -72,7 +72,7 @@ Player = function(id) {
     }
   };
 
-  self.dropArtifacts = function(name) {
+  self.dropArtifacts = function (name) {
     new Artifact(
       name,
       Math.floor(self.x / TILE_SIZE),
@@ -82,12 +82,12 @@ Player = function(id) {
     console.log(self.artifacts);
   };
 
-  self.shootBullet = function(angle) {
+  self.shootBullet = function (angle) {
     const b = Bullet(self.id, self.firstSkill, angle, 100);
     b.x = self.x;
     b.y = self.y;
   };
-  self.updateSpd = function() {
+  self.updateSpd = function () {
     self.bumperRight = { x: self.x + self.width / 2, y: self.y };
     self.bumperLeft = { x: self.x - self.width / 2, y: self.y };
     self.bumperUp = { x: self.x, y: self.y - self.height / 2 };
@@ -113,7 +113,7 @@ Player = function(id) {
     } else self.spdY = 0;
   };
 
-  self.getInitPack = function() {
+  self.getInitPack = function () {
     return {
       id: self.id,
       x: self.x,
@@ -127,7 +127,7 @@ Player = function(id) {
     };
   };
 
-  self.getUpdatePack = function() {
+  self.getUpdatePack = function () {
     return {
       id: self.id,
       x: self.x,
@@ -148,14 +148,14 @@ Player = function(id) {
 };
 
 Player.list = {};
-Player.getAllInitPack = function() {
+Player.getAllInitPack = function () {
   const players = [];
   for (let i in Player.list) {
     players.push(Player.list[i].getInitPack());
   }
   return players;
 };
-Player.update = function() {
+Player.update = function () {
   const pack = [];
   for (let i in Player.list) {
     const player = Player.list[i];
