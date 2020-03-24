@@ -1,0 +1,857 @@
+<div id="signDiv"
+  style=" width:100%; height:100%; color:azure; font-weight: bold; background-color: #222034; display:flex; flex-direction: column; justify-content: center; padding-left:45%; ">
+  Username:
+  <input id="signDiv-username" type="text" placeholder="type: bob"
+    style=" width:15%; height:5%; border-radius: 3px; border:azure 2px solid; font-size: large; font-weight: bold; text-align: center;" /><br />
+  Password:
+  <input id="signDiv-password" type="password" placeholder="type: pass"
+    style="width:15%; height:5%; border-radius: 3px; border:azure 2px solid; font-size: large; font-weight: bold; text-align: center; " /><br /><br />
+  <button id="signDiv-signIn"
+    style="width:15%;height:5%;color:#222034; font-weight: bold; font-size: large; background-color:#e9e9e9;border-radius: 3px;">
+    Sign In</button><br />
+  <button id="signDiv-signUp"
+    style="width:15%;height:5%;color:#222034; font-weight: bold; font-size: large;background-color:#d3d3d3;border-radius: 3px;">
+    Create Account
+  </button>
+</div>
+
+<!--........................................MAIN MENU................................................-->
+
+<div id="mainMenu"
+  style="width:100%;height:100%;color:azure; font-weight: bold; background-color: #222034; display:flex; flex-direction: column; justify-content: center; padding-left:41%; display:none">
+  <button id="btn-enterDungeon"
+    style="width:20%;height:8%; margin-top:15%;background-color: #d3d3d3;font-weight: bold; font-size: large;border-radius: 3px;">
+    Enter Dungeon
+  </button><br>
+  <button id="SpellBook"
+    style="width:20%;height:8%; margin-top:2.5%; background-color: #d3d3d3;font-weight: bold; font-size: large;border-radius: 3px;">
+    SpellBook
+  </button>
+</div>
+<!--......................................DUNGEON MENU...............................................-->
+<div id="dungeonMenu"
+  style="width:100%;height:100%;color:azure; font-weight: bold; background-color: #222034;  display:none;">
+  <div style="display:flex; width:100%; height:80%">
+    <div id="displayMapIcon" style="width:50%; margin:2%;height:80%; border:2px solid azure;"></div>
+    <div id="displayMap" style="width:50%; margin:2%; margin-bottom:0%;height:100%; border: 2px solid azure; "></div>
+  </div>
+  <button id="btnStartGame" style=" width:20%; height:8%; margin-left:65%; background-color: #d3d3d3;font-weight: bold;
+    font-size: large;border-radius: 3px;">Start
+    Game</button>
+
+</div>
+
+
+<!--.......................................GameDIV...................................................-->
+
+<div id="gameDiv" style="display:none;">
+  <canvas id="ctx" width="2160" height="2208" style="border:1px solid #000000; background-color:  #222034;">
+  </canvas>
+  <div id="firstSkill" style="position:absolute; top:88%; left:3%; width:5%; height:9%; border: 3px solid azure; background-color:#222034;  background-size:100%;
+      background-repeat: no-repeat; z-index:100;"></div>
+  <div id="artifactList"
+    style="position:absolute; top:88%; left:75%;width:15%;height:9%; border: 3px solid azure; background-color:#222034;">
+  </div>
+  <div id="chat-text" style="width:500px; height:100px; overflow-y:scroll;"></div>
+  <form id="chat-form">
+    <input id="chat-input" type="text" style="width:500px" />
+  </form>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="./client/img.js"></script>
+
+<script type="module">
+  const WIDTH = 1705;
+  const HEIGHT = 768;
+  const TILE_SIZE = 96;
+  let CANVAS_WIDTH = 1705;
+  let CANVAS_HEIGHT = 768;
+  var canvas = document.getElementById("ctx");
+  let resizeCanvas = function () {
+    CANVAS_WIDTH = window.innerWidth - 4;
+    CANVAS_HEIGHT = window.innerHeight - 4;
+
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+
+    canvas.style.width = "" + CANVAS_WIDTH + "px";
+    canvas.style.height = "" + CANVAS_HEIGHT + "px";
+  };
+  resizeCanvas();
+  window.addEventListener("resize", function () {
+    resizeCanvas();
+  });
+  const socket = io();
+  //sign
+  const signDiv = document.getElementById("signDiv");
+  const signDivUsername = document.getElementById("signDiv-username");
+  const signDivSignIn = document.getElementById("signDiv-signIn");
+  const signDivSignUp = document.getElementById("signDiv-signUp");
+  const signDivPassword = document.getElementById("signDiv-password");
+  const gameDiv = document.getElementById("gameDiv");
+  const firstSkill = document.getElementById("firstSkill");
+  const artifactDisplay = document.getElementById("artifactList");
+
+  //.............................MAIN MENU.............................................................
+  const mainMenuDiv = document.getElementById("mainMenu");
+  const spellBookBtn = document.getElementById("SpellBook");
+  const btnEnterDungeon = document.getElementById("btn-enterDungeon");
+  //.......Dungeon Menu................................................................................
+  const dungeonMenu = document.getElementById("dungeonMenu");
+  const displayMapIcon = document.getElementById("displayMapIcon");
+  const displayMap = document.getElementById("displayMap");
+  const btnStartGame = document.getElementById("btnStartGame")
+  //......................................................................................................
+  signDivSignIn.onclick = function () {
+    socket.emit("signIn", {
+      username: signDivUsername.value,
+      password: signDivPassword.value
+    });
+  };
+
+  signDivSignUp.onclick = function () {
+    socket.emit("signUp", {
+      username: signDivUsername.value,
+      password: signDivPassword.value
+    });
+  };
+  socket.on("signInResponse", function (data) {
+    if (data.success) {
+      signDiv.style.display = "none";
+      mainMenuDiv.style.display = "inline-block";
+    } else {
+      alert("Sign in unseccessful");
+    }
+  });
+
+  socket.on("signUpResponse", function (data) {
+    if (data.success) {
+      alert("Sign up is successfull");
+    } else {
+      alert("Sign up unseccessful");
+    }
+  });
+  //................................MENU BUTTONS......................................................
+
+  btnEnterDungeon.onclick = function () {
+    mainMenuDiv.style.display = "none";
+    dungeonMenu.style.display = "inline-block";
+  }
+  btnStartGame.onclick = function () {
+    dungeonMenu.style.display = "none";
+    gameDiv.style.display = "inline-block";
+  }
+
+  //.......................................................................................................
+
+  const chatText = document.getElementById("chat-text");
+  const chatInput = document.getElementById("chat-input");
+  const chatForm = document.getElementById("chat-form");
+
+  //game
+  const ctx = document.getElementById("ctx").getContext("2d");
+  ctx.font = "30px Arial";
+
+  //init
+  const Player = function (initPack) {
+    const self = {};
+    self.id = initPack.id;
+    self.race = initPack.race;
+    self.number = initPack.number;
+    self.x = initPack.x;
+    self.y = initPack.y;
+    self.hp = initPack.hp;
+    self.hpMax = initPack.hpMax;
+    self.score = initPack.score;
+    self.spriteAnimeCounter = 0;
+    self.isDead = false;
+    self.isCorpseDroped = false;
+    self.firstSkill = "fireball";
+    self.artifacts = [];
+    self.armor = initPack.armor;
+
+    self.updateUI = function () {
+      firstSkill.style.backgroundImage = `url(${Img[self.firstSkill].src})`;
+
+      artifactDisplay.innerHTML = "";
+      for (let i = 0; i < self.artifacts.length; i++) {
+        artifactDisplay.innerHTML += `<div style="position:absolute; width:33%;height:100%;background-size:100%; background-repeat: no-repeat; background-image:url('${
+          Img[self.artifacts[i] + "Icon"].src
+          }');"></div>`;
+      }
+    };
+    self.draw = function () {
+      if (self.isDead) return;
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      const hpWidth = (50 * self.hp) / self.hpMax;
+      ctx.fillStyle = "red";
+      ctx.fillRect(x - hpWidth / 3, y - 52, hpWidth, 10);
+
+      const width = 90; // player size
+      const height = 90;
+      const frameWidth = 144 / 3; //depends on your sprite
+      const frameHeight = 192 / 4;
+      let walkingMod = Math.floor(self.spriteAnimeCounter) % 3;
+
+      let aimAngle = self.mouseAngle;
+      if (aimAngle < 0) {
+        aimAngle = 360 + aimAngle;
+      }
+      self.directionMod = 3; //draw right
+      if (aimAngle >= 45 && aimAngle < 135) {
+        // down
+        self.directionMod = 2;
+      } else if (aimAngle >= 135 && aimAngle < 225) {
+        //left
+        self.directionMod = 1;
+      } else if (aimAngle >= 225 && aimAngle < 315) {
+        //up
+        self.directionMod = 0;
+      }
+      let arr = ["BodyNone", "BootsNone", "HelmetNone", "WeaponNone"];
+      let arr2 = Object.values(self.armor);
+
+      for (let i in arr) {
+        ctx.drawImage(
+          Img[self.race + arr[i]],
+          walkingMod * frameWidth,
+          self.directionMod * frameHeight,
+          frameWidth,
+          frameHeight,
+          x - width / 2,
+          y - height / 2,
+          width * 1.2,
+          height * 1.2
+        );
+      }
+      // if closes on
+      for (let i in arr2) {
+        if (arr2[i] !== "None") {
+          ctx.drawImage(
+            Img[arr2[i]],
+            walkingMod * frameWidth,
+            self.directionMod * frameHeight,
+            frameWidth,
+            frameHeight,
+            x - width / 2,
+            y - height / 2,
+            width * 1.2,
+            height * 1.2
+          );
+        }
+      } /*
+      ctx.drawImage(
+        Img[self.race + "WeaponNone"],
+        walkingMod * frameWidth,
+        self.directionMod * frameHeight,
+        frameWidth,
+        frameHeight,
+        x - width / 2,
+        y - height / 2,
+        width * 1.2,
+        height * 1.2
+      ); */
+    };
+    Player.list[self.id] = self;
+    return self;
+  };
+  Player.list = {};
+  //........................................ENEMY..............................................
+  //...........................................................................................
+  //...........................................................................................
+  const Enemy = function (initPack) {
+    const self = {};
+    self.id = initPack.id;
+    self.name = initPack.name;
+    self.x = initPack.x;
+    self.y = initPack.y;
+    self.width = initPack.width;
+    self.height = initPack.height;
+    self.animeFrameCount = 0;
+    self.hpMax = initPack.hpMax;
+    self.hp = initPack.hpMax;
+    self.aimAngle = initPack.aimAngle;
+    self.isCorpseDroped = false;
+    self.draw = function () {
+      let x = self.x - Player.list[selfId].x + WIDTH / 2 - self.width / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2 - self.height / 2;
+
+      const hpWidth = (50 * self.hp) / self.hpMax;
+      ctx.fillStyle = "red";
+      ctx.fillRect(x + self.width / 5, y - 20, hpWidth, 10);
+
+      let frameWidth = Img[self.name].width / 3;
+      let frameHeight = Img[self.name].height / 4;
+
+      let aimAngle = self.aimAngle;
+      if (aimAngle < 0) {
+        aimAngle = 360 + aimAngle;
+      }
+
+      self.directionMod = 3; //draw right
+      if (aimAngle >= 45 && aimAngle < 135) {
+        // down
+        self.directionMod = 2;
+      } else if (aimAngle >= 135 && aimAngle < 225) {
+        //left
+        self.directionMod = 1;
+      } else if (aimAngle >= 225 && aimAngle < 315) {
+        //up
+        self.directionMod = 0;
+      }
+      let walkingMod = Math.floor(self.animeFrameCount) % 3;
+      self.img = Img[self.name];
+      if (self.isAttacking) {
+        self.img = Img[self.name + "Attack"];
+      }
+      ctx.drawImage(
+        self.img,
+        walkingMod * frameWidth,
+        self.directionMod * frameHeight,
+        frameWidth,
+        frameHeight,
+        x,
+        y,
+        self.width,
+        self.height
+      );
+    };
+    enemyList[self.id] = self;
+    return self;
+  };
+  const enemyList = {};
+  //.......................................BULLET..................................................
+  //.................................................................................................
+  //.................................................................................................
+  const Bullet = function (initPack) {
+    const self = {};
+    self.id = initPack.id;
+    self.x = initPack.x;
+    self.y = initPack.y;
+    self.explosionframeCount = 0;
+    self.isExplosion = false;
+    self.type = initPack.type;
+
+    self.draw = function () {
+      if (self.x === null || self.y === null) {
+        return;
+      }
+      let img = Img[self.type];
+
+      const width = img.width / 2;
+      const height = img.height / 2;
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+      if (self.isExplosion) {
+        img = Img[self.type + "Explosion"];
+        let frameWidth = img.width / 6;
+        let frameHeight = img.height;
+        let walk = Math.floor(self.explosionframeCount / 25);
+
+        ctx.drawImage(
+          img,
+          walk * frameWidth,
+          0,
+          frameWidth,
+          frameHeight,
+          x - width / 2,
+          y - height / 2,
+          width,
+          height
+        );
+      } else {
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          img.width,
+          img.height,
+          x - width / 2,
+          y - height / 2,
+          width,
+          height
+        );
+      }
+    };
+    Bullet.list[self.id] = self;
+    return self;
+  };
+  Bullet.list = {};
+
+  let selfId = null;
+  //.................................................CORPSE...............................................//
+  //......................................................................................................//
+  //......................................................................................................//
+  const Corpse = function (x, y) {
+    const self = {
+      id: Math.random(),
+      x: x,
+      y: y
+    };
+    self.draw = function () {
+      const x = self.x - Player.list[selfId].x + WIDTH / 2;
+      const y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      ctx.drawImage(
+        Img.corpse,
+        0,
+        0,
+        90,
+        90,
+        x - TILE_SIZE / 2,
+        y - TILE_SIZE / 2,
+        90,
+        90
+      );
+    };
+    corpseList[self.id] = self;
+    return self;
+  };
+
+  const corpseList = {};
+  //.............................................TORCH.................................................//
+  //...................................................................................................//
+  //...................................................................................................//
+  const Torch = function (initPack) {
+    const self = {
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y,
+      torchFrameCount: initPack.torchFrameCount
+    };
+    self.height = TILE_SIZE - 2;
+    self.width = TILE_SIZE - 2;
+    self.draw = function () {
+      ctx.save();
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      let frameWidth = Img.torch.width / 6;
+      let walk = Math.floor(self.torchFrameCount / 25);
+
+      ctx.drawImage(
+        Img.torch,
+        walk * frameWidth,
+        0,
+        frameWidth,
+        frameWidth,
+        x - TILE_SIZE,
+        y - TILE_SIZE + 2,
+        self.width + 2,
+        self.height + 2
+      );
+      ctx.restore();
+    };
+    self.update = function () {
+      self.torchFrameCount += 5;
+      if (self.torchFrameCount >= 75) {
+        self.torchFrameCount = 0;
+      }
+      self.draw();
+    };
+
+    torchList[self.id] = self;
+    return self;
+  };
+  const torchList = {};
+  //..........................................ARTIFACT...................................................//
+  //.....................................................................................................//
+  //.....................................................................................................//
+
+  const Artifact = function (initPack) {
+    const self = {
+      name: initPack.name,
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y
+    };
+    self.animeFrameCount = 0;
+    self.height = TILE_SIZE - 2;
+    self.width = TILE_SIZE - 2;
+    self.img = Img[self.name];
+    self.draw = function () {
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      let frameWidth = self.img.width / 6;
+      let walk = Math.floor(self.animeFrameCount / 25);
+
+      ctx.drawImage(
+        self.img,
+        walk * frameWidth,
+        0,
+        frameWidth,
+        frameWidth,
+        x - TILE_SIZE / 3,
+        y - TILE_SIZE / 2 + 2,
+        self.width / 1.2 + 2,
+        self.height / 1.2 + 2
+      );
+    };
+    self.update = function () {
+      self.animeFrameCount += 4;
+      if (self.animeFrameCount >= 126) {
+        self.animeFrameCount = 0;
+      }
+      self.draw();
+    };
+
+    artifactList[self.id] = self;
+    return self;
+  };
+  const artifactList = {};
+  //..............................................COFFIN.................................................//
+  //.....................................................................................................//
+  //.....................................................................................................//
+
+  const Coffin = function (initPack) {
+    const self = {
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y
+    };
+
+    self.height = TILE_SIZE * 2 - 2;
+    self.width = TILE_SIZE * 2 - 2;
+    self.isAwaken = false;
+    self.isTriggered = false;
+    self.coffinframeCount = 0;
+    self.draw = function () {
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+      let frameWidth = Img.coffin.width / 6;
+      if (!self.isTriggered) {
+        ctx.drawImage(
+          Img.coffin,
+          0,
+          0,
+          frameWidth,
+          frameWidth,
+          x - TILE_SIZE - TILE_SIZE / 4,
+          y - TILE_SIZE,
+          frameWidth * 1.4,
+          frameWidth * 1.2
+        );
+      } else {
+        let walk = Math.floor(self.coffinframeCount / 25);
+        ctx.drawImage(
+          Img.coffin,
+          walk * frameWidth,
+          0,
+          frameWidth,
+          frameWidth,
+          x - TILE_SIZE - TILE_SIZE / 4,
+          y - TILE_SIZE,
+          frameWidth * 1.4,
+          frameWidth * 1.2
+        );
+      }
+    };
+
+    coffinList[self.id] = self;
+    return self;
+  };
+  const coffinList = {};
+
+  //............................................SOCKETS................................................//
+  //...................................................................................................//
+  //...................................................................................................//
+  socket.on("init", function (data) {
+    if (data.selfId) {
+      selfId = data.selfId;
+    }
+    for (let i = 0; i < data.player.length; i++) {
+      new Player(data.player[i]);
+    }
+    for (let i = 0; i < data.bullet.length; i++) {
+      new Bullet(data.bullet[i]);
+    }
+    for (let i = 0; i < data.torch.length; i++) {
+      new Torch(data.torch[i]);
+    }
+    for (let i = 0; i < data.coffin.length; i++) {
+      new Coffin(data.coffin[i]);
+    }
+
+    for (let i = 0; i < data.enemy.length; i++) {
+      new Enemy(data.enemy[i]);
+    }
+    for (let i = 0; i < data.artifact.length; i++) {
+      new Artifact(data.artifact[i]);
+    }
+  });
+
+  //update
+  socket.on("update", function (data) {
+    for (let i = 0; i < data.player.length; i++) {
+      const pack = data.player[i];
+      const p = Player.list[pack.id];
+      if (p) {
+        if (pack.x === p.x && pack.y === p.y) {
+          p.isStanding = true;
+        }
+        if (pack.x !== undefined) {
+          p.x = pack.x;
+        }
+        if (pack.y !== undefined) {
+          p.y = pack.y;
+        }
+        if (pack.hp !== undefined) {
+          p.hp = pack.hp;
+        }
+        if (pack.score !== undefined) {
+          p.score = pack.score;
+        }
+        if (pack.mouseAngle !== undefined) {
+          p.mouseAngle = pack.mouseAngle;
+        }
+        if (pack.spriteAnimeCounter !== undefined) {
+          p.spriteAnimeCounter = pack.spriteAnimeCounter;
+        }
+        if (pack.isDead !== undefined) {
+          p.isDead = pack.isDead;
+          if (p.isDead) {
+            if (!p.isCorpseDroped);
+            Corpse(p.x, p.y);
+            p.isCorpseDroped = true;
+          }
+        }
+        if (pack.firstSkill !== undefined) {
+          p.firstSkill = pack.firstSkill;
+        }
+        if (pack.artifacts !== undefined) {
+          p.artifacts = pack.artifacts;
+        }
+
+        if (pack.armor !== undefined) {
+          p.armor = pack.armor;
+        }
+      }
+
+      for (let i = 0; i < data.bullet.length; i++) {
+        const pack = data.bullet[i];
+        const b = Bullet.list[data.bullet[i].id];
+        if (b) {
+          if (pack.x !== undefined) {
+            b.x = pack.x;
+          }
+          if (pack.y !== undefined) {
+            b.y = pack.y;
+          }
+          if (pack.isExplosion !== undefined) {
+            b.isExplosion = pack.isExplosion;
+          }
+          if (pack.explosionframeCount !== undefined) {
+            b.explosionframeCount = pack.explosionframeCount;
+          }
+          if (pack.type !== undefined) {
+            b.type = pack.type;
+          }
+        }
+      }
+      for (let i = 0; i < data.coffin.length; i++) {
+        const pack = data.coffin[i];
+        const c = coffinList[data.coffin[i].id];
+        if (c) {
+          if (pack.isTriggered !== undefined) {
+            c.isTriggered = pack.isTriggered;
+          }
+          if (pack.isAwaken !== undefined) {
+            c.isAwaken = pack.isAwaken;
+          }
+          if (pack.coffinframeCount !== undefined) {
+            c.coffinframeCount = pack.coffinframeCount;
+          }
+        }
+      }
+      for (let i = 0; i < data.enemy.length; i++) {
+        const pack = data.enemy[i];
+        const e = enemyList[data.enemy[i].id];
+        if (e) {
+          if (pack.aimAngle !== undefined) {
+            e.aimAngle = pack.aimAngle;
+          }
+          if (pack.animeFrameCount !== undefined) {
+            e.animeFrameCount = pack.animeFrameCount;
+          }
+          if (pack.x !== undefined) {
+            e.x = pack.x;
+          }
+          if (pack.y !== undefined) {
+            e.y = pack.y;
+          }
+          if (pack.hp !== undefined) {
+            e.hp = pack.hp;
+          }
+          if (pack.toRemove) {
+            if (!e.isCorpseDroped);
+            Corpse(e.x, e.y);
+            e.isCorpseDroped = true;
+          }
+          if (pack.isAttacking !== undefined) {
+            e.isAttacking = pack.isAttacking;
+          }
+        }
+      }
+      for (let i = 0; i < data.artifact.length; i++) {
+        const pack = data.artifact[i];
+        const a = artifactList[data.artifact[i].id];
+        if (a) {
+          if (pack.owner !== "") {
+            Player.list[pack.owner].artifact = pack.name;
+          }
+        }
+      }
+    }
+  });
+
+  //remove
+
+  socket.on("remove", function (data) {
+    for (let i = 0; i < data.player.length; i++) {
+      delete Player.list[data.player[i]];
+    }
+    for (let i = 0; i < data.bullet.length; i++) {
+      delete Bullet.list[data.bullet[i]];
+    }
+    for (let i = 0; i < data.enemy.length; i++) {
+      delete enemyList[data.enemy[i]];
+    }
+    for (let i = 0; i < data.artifact.length; i++) {
+      delete artifactList[data.artifact[i]];
+    }
+  });
+
+  //draw
+
+  setInterval(function () {
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    if (!selfId) return;
+    drawMap();
+
+    Player.list[selfId].updateUI();
+    drawScore();
+    for (let i in torchList) {
+      torchList[i].update();
+    }
+    for (let i in corpseList) {
+      corpseList[i].draw();
+    }
+
+    for (let i in coffinList) {
+      coffinList[i].draw();
+    }
+    for (let i in artifactList) {
+      artifactList[i].update();
+    }
+    for (let i in enemyList) {
+      enemyList[i].draw();
+    }
+    for (let i in Player.list) {
+      Player.list[i].draw();
+    }
+    for (let i in Bullet.list) {
+      Bullet.list[i].draw();
+    }
+  }, 40);
+
+  const drawMap = function () {
+    let x = WIDTH / 2 - Player.list[selfId].x;
+    let y = HEIGHT / 2 - Player.list[selfId].y;
+    let mapWidth = 45;
+    let mapHeight = 46;
+
+    ctx.drawImage(
+      Img.map,
+      0,
+      0,
+      mapWidth * 48,
+      mapHeight * 48,
+      x,
+      y,
+      mapWidth * 48 * 2,
+      mapHeight * 48 * 2
+    );
+  };
+
+  const drawScore = function () {
+    ctx.fillStyle = "white";
+    ctx.fillText(Player.list[selfId].score, 0, 30);
+  };
+  //....................................................................................................//
+  socket.on("addToChat", function (data) {
+    chatText.innerHTML += "<div>" + data + "</div>";
+  });
+
+  socket.on("evalAnswer", function (data) {
+    console.log(data);
+  });
+
+  chatForm.onsubmit = function (e) {
+    e.preventDefault();
+    if (chatInput.value[0] === "/")
+      socket.emit("evalServer", chatInput.values.slice(1));
+    else socket.emit("sendMsgToServer", chatInput.value);
+    chatInput.value = "";
+  };
+  //.....................CONTROLLS..............................
+
+  document.onkeydown = function (event) {
+    if (selfId && !Player.list[selfId].isDead) {
+      if (event.keyCode === 68)
+        //d
+        socket.emit("keyPress", { inputId: "right", state: true });
+      else if (event.keyCode === 83)
+        //s
+        socket.emit("keyPress", { inputId: "down", state: true });
+      else if (event.keyCode === 65)
+        //a
+        socket.emit("keyPress", { inputId: "left", state: true });
+      else if (event.keyCode === 87)
+        //w
+        socket.emit("keyPress", { inputId: "up", state: true });
+      else if (event.keyCode === 49)
+        //1
+        socket.emit("changeSkill", { inputId: "1" });
+    }
+  };
+
+  document.onkeyup = function (event) {
+    if (event.keyCode === 68)
+      //d
+      socket.emit("keyPress", { inputId: "right", state: false });
+    else if (event.keyCode === 83)
+      //s
+      socket.emit("keyPress", { inputId: "down", state: false });
+    else if (event.keyCode === 65)
+      //a
+      socket.emit("keyPress", { inputId: "left", state: false });
+    else if (event.keyCode === 87)
+      //w
+      socket.emit("keyPress", { inputId: "up", state: false });
+  };
+
+  document.onmousedown = function (event) {
+    if (selfId && !Player.list[selfId].isDead)
+      socket.emit("keyPress", { inputId: "attack", state: true });
+  };
+  document.onmouseup = function (event) {
+    socket.emit("keyPress", { inputId: "attack", state: false });
+  };
+
+  document.onmousemove = function (event) {
+    let x =
+      -WIDTH / 2 +
+      event.clientX -
+      document.getElementById("ctx").getBoundingClientRect().left; //250 middle of the screen
+    let y =
+      -HEIGHT / 2 +
+      event.clientY -
+      document.getElementById("ctx").getBoundingClientRect().top;
+    let angle = (Math.atan2(y, x) / Math.PI) * 180;
+    socket.emit("keyPress", { inputId: "mouseAngle", state: angle });
+  };
+</script>
