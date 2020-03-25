@@ -1,4 +1,4 @@
-Enemy = function(name, x, y, bulletType) {
+Enemy = function (name, x, y, bulletType) {
   const self = Entity();
   self.purpose = "enemy";
   self.id = Math.random();
@@ -21,7 +21,7 @@ Enemy = function(name, x, y, bulletType) {
   self.hp = 10;
   self.observation = 8;
 
-  self.getInitPack = function() {
+  self.getInitPack = function () {
     return {
       id: self.id,
       name: self.name,
@@ -33,7 +33,7 @@ Enemy = function(name, x, y, bulletType) {
       aimAngle: self.aimAngle
     };
   };
-  self.getUpdatePack = function() {
+  self.getUpdatePack = function () {
     return {
       id: self.id,
       x: self.x,
@@ -46,14 +46,16 @@ Enemy = function(name, x, y, bulletType) {
     };
   };
 
-  self.updateAim = function() {
+  self.updateAim = function () {
+
+
     //choosing the nearest player...........................
     let arr = [];
     let arr2 = [];
     for (let i in Player.list) {
       if (!Player.list[i].isDead) {
         arr.push([self.getDistance(Player.list[i]), Player.list[i].id]);
-      }
+      } else { return self.aimAngle }
     }
     arr.map(it => arr2.push(it[0]));
     let closestDist = Math.min(...arr2);
@@ -68,7 +70,7 @@ Enemy = function(name, x, y, bulletType) {
     self.aimAngle = (Math.atan2(diffY, diffX) / Math.PI) * 180;
   };
 
-  self.performAttack = function() {
+  self.performAttack = function () {
     if (self.attackCount > self.attackRecharge) {
       let b = Bullet(self.id, self.bulletType, self.aimAngle, 100);
       b.x = self.x;
@@ -81,8 +83,11 @@ Enemy = function(name, x, y, bulletType) {
       self.isAttacking = false;
     }
   };
-  self.updatePosition = function() {
+  self.updatePosition = function () {
     self.attackCount++;
+    for (let i in Player.list) {
+      if (Player.list[i].isDead) { return }
+    }
     //if the enemy doesn't see player  he doesn't move
     if (self.getDistance(self.targetPlayer) > TILE_SIZE * self.observation) {
       return;
@@ -126,29 +131,31 @@ Enemy = function(name, x, y, bulletType) {
     }
   };
 
-  self.update = function() {
+  self.update = function () {
     self.updateAim();
     self.updatePosition();
     if (self.toRemove) {
+      enemyCounter -= 1
       delete enemyList[self.id];
       removePack.enemy.push(self.id);
     }
   };
 
   enemyList[self.id] = self;
+  enemyCounter++
   initPack.enemy.push(self.getInitPack());
   return self;
 };
-
+enemyCounter = 0
 enemyList = {};
-Enemy.getAllInitPack = function() {
+Enemy.getAllInitPack = function () {
   const enemies = [];
   for (let i in enemyList) {
     enemies.push(enemyList[i].getInitPack());
   }
   return enemies;
 };
-Enemy.superUpdate = function() {
+Enemy.superUpdate = function () {
   const pack = [];
   for (let i in enemyList) {
     const enemy = enemyList[i];
