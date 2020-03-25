@@ -143,10 +143,11 @@ Player = function (id) {
     };
   };
   Player.list[id] = self;
+  playerCounter++
   initPack.player.push(self.getInitPack());
   return self;
 };
-
+playerCounter = 0;
 Player.list = {};
 Player.getAllInitPack = function () {
   const players = [];

@@ -143,6 +143,7 @@ io.sockets.on("connection", function (socket) {
   });
 
   socket.on("disconnect", function () {
+    playerCounter -= 1;
     delete SOCKET_LIST[socket.id];
     Player.onDisconnect(socket);
   });

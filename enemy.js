@@ -132,6 +132,9 @@ Enemy = function (name, x, y, bulletType) {
   };
 
   self.update = function () {
+    if (playerCounter === 0) {
+      return
+    }
     self.updateAim();
     self.updatePosition();
     if (self.toRemove) {
