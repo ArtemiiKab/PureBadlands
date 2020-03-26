@@ -57,7 +57,7 @@
 <!--.......................................GameDIV...................................................-->
 
 <div id="gameDiv" style="display:none;">
-  <canvas id="ctx" width="2160" height="2208" style="border:1px solid #000000; background-color:  #222034;">
+  <canvas id="ctx" width="1705" height="768" style="border:1px solid #000000; background-color:  #222034;">
   </canvas>
   <div id="firstSkill" style="position:absolute; top:88%; left:3%; width:5%; height:9%; border: 3px solid azure; background-color:#222034;  background-size:100%;
       background-repeat: no-repeat; z-index:100;"></div>
@@ -910,13 +910,13 @@
 
   document.onmousemove = function (event) {
     let x =
-      -WIDTH / 2 +
+
       event.clientX -
-      document.getElementById("ctx").getBoundingClientRect().left; //250 middle of the screen
+      document.getElementById("ctx").getBoundingClientRect().left - CANVAS_WIDTH / 2; //250 middle of the screen
     let y =
-      -HEIGHT / 2 +
+
       event.clientY -
-      document.getElementById("ctx").getBoundingClientRect().top;
+      document.getElementById("ctx").getBoundingClientRect().top - CANVAS_HEIGHT / 2;
     let angle = (Math.atan2(y, x) / Math.PI) * 180;
     socket.emit("keyPress", { inputId: "mouseAngle", state: angle });
   };
