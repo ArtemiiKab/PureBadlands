@@ -1,5 +1,5 @@
-Player = function (id) {
-  const self = Entity();
+Player = function (param) {
+  const self = Entity(param);
   self.purpose = "player";
   let races = ["Elf", "Human"];
   let helmets = [
@@ -14,7 +14,7 @@ Player = function (id) {
   self.race = races[Math.floor(Math.random() * 2)];
   self.x = 700;
   self.y = 350;
-  self.id = id;
+
   self.number = "" + Math.floor(10 * Math.random());
   self.pressingRight = false;
   self.pressingLeft = false;
@@ -25,8 +25,11 @@ Player = function (id) {
   self.score = 0;
   self.width = 90;
   self.height = 90;
+  self.attackCounter = 0
   self.artifacts = [];
   self.isDead = false;
+  //lower better
+  self.attackRecharge = 15;
 
   self.deadTimer = 0;
   //closes
@@ -47,10 +50,12 @@ Player = function (id) {
   self.spriteAnimeCounter = 0;
   const super_update = self.update;
   self.update = function () {
+    self.attackCounter++
     self.updateSpd();
     super_update();
-    if (self.pressingAttack) {
+    if (self.pressingAttack && self.attackCounter > self.attackRecharge && !self.isDead) {
       self.shootBullet(self.mouseAngle);
+      self.attackCounter = 0;
     }
     if (self.isDead) {
       self.deadTimer++;
@@ -76,16 +81,14 @@ Player = function (id) {
     new Artifact(
       name,
       Math.floor(self.x / TILE_SIZE),
-      Math.floor(self.y / TILE_SIZE)
+      Math.floor(self.y / TILE_SIZE), self.map
     );
     self.artifacts.splice(self.artifacts.indexOf(name), 1);
-    console.log(self.artifacts);
+
   };
 
   self.shootBullet = function (angle) {
-    const b = Bullet(self.id, self.firstSkill, angle, 100);
-    b.x = self.x;
-    b.y = self.y;
+    Bullet({ parent: self.id, angle: angle, x: self.x, y: self.y, bulletType: self.firstSkill, lifespan: 100, map: self.map });
   };
   self.updateSpd = function () {
     self.bumperRight = { x: self.x + self.width / 2, y: self.y };
@@ -93,21 +96,21 @@ Player = function (id) {
     self.bumperUp = { x: self.x, y: self.y - self.height / 2 };
     self.bumperDown = { x: self.x, y: self.y + self.height / 2 };
 
-    if (self.pressingRight && !currentMap.isPositionWall(self.bumperRight)) {
+    if (self.pressingRight && !self.map.isPositionWall(self.bumperRight)) {
       self.spdX = self.maxSpd;
       self.spriteAnimeCounter += 0.2;
     } else if (
       self.pressingLeft &&
-      !currentMap.isPositionWall(self.bumperLeft)
+      !self.map.isPositionWall(self.bumperLeft)
     ) {
       self.spdX = -self.maxSpd;
       self.spriteAnimeCounter += 0.2;
     } else self.spdX = 0;
 
-    if (self.pressingDown && !currentMap.isPositionWall(self.bumperDown)) {
+    if (self.pressingDown && !self.map.isPositionWall(self.bumperDown)) {
       self.spdY = self.maxSpd;
       self.spriteAnimeCounter += 0.2;
-    } else if (self.pressingUp && !currentMap.isPositionWall(self.bumperUp)) {
+    } else if (self.pressingUp && !self.map.isPositionWall(self.bumperUp)) {
       self.spdY = -self.maxSpd;
       self.spriteAnimeCounter += 0.2;
     } else self.spdY = 0;
@@ -123,7 +126,8 @@ Player = function (id) {
       hpMax: self.hpMax,
       score: self.score,
       armor: self.armor,
-      race: self.race
+      race: self.race,
+      map: self.map.id
     };
   };
 
@@ -142,12 +146,14 @@ Player = function (id) {
       armor: self.armor
     };
   };
-  Player.list[id] = self;
-  playerCounter++
+  Player.list[self.id] = self;
+  playerCounter[self.map.id]++
   initPack.player.push(self.getInitPack());
   return self;
 };
-playerCounter = 0;
+playerCounter = {}
+playerCounter.Pyramid = 0;
+playerCounter.mainCamp = 0;
 Player.list = {};
 Player.getAllInitPack = function () {
   const players = [];

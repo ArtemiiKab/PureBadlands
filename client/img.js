@@ -82,8 +82,22 @@ Img.frostball.src = "/client/img/bullets/frostballDown.png";
 Img.frostballExplosion = new Image();
 Img.frostballExplosion.src = "/client/img/bullets/frostballExplosion.png";
 //..............................................MAP AND STUFF.....................................
-Img.map = new Image();
-Img.map.src = "/client/img/maps/Pyramid.png";
+Img.Pyramid = new Image();
+Img.Pyramid.src = "/client/img/maps/Pyramid.png";
+Img.PyramidIcon = new Image();
+Img.PyramidIcon.src = "/client/img/icons/PyramidOfDoom.png"
+Img.PyramidStructure = new Image();
+Img.PyramidStructure.src = "/client/img/maps/PyramidIntro.png"
+
+
+
+
+Img.mainCamp = new Image();
+Img.mainCamp.src = "/client/img/maps/mainCamp.png";
+Img.mainCampIcon = new Image();
+Img.mainCampIcon.src = "/client/img/icons/mainCamp.png"
+Img.mainCampStructure = new Image();
+Img.mainCampStructure.src = "/client/img/maps/mainCampIntro.png"
 
 Img.torch = new Image();
 Img.torch.src = "/client/img/extra/torch2.png";

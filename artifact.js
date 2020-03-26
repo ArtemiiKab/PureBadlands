@@ -1,9 +1,9 @@
-Artifact = function(name, colX, rowY) {
+Artifact = function (name, colX, rowY, map) {
   const self = Entity();
   self.name = name;
   self.x = colX * TILE_SIZE + TILE_SIZE;
   self.y = rowY * TILE_SIZE + TILE_SIZE;
-
+  self.map = map
   self.id = Math.random();
   self.width = TILE_SIZE / 1.2;
   self.height = TILE_SIZE / 1.2;
@@ -11,16 +11,16 @@ Artifact = function(name, colX, rowY) {
   self.owner = "";
   self.magicAbility = "bloodball";
 
-  self.update = function() {
+  self.update = function () {
     for (let i in Player.list) {
-      if (self.testCollision(Player.list[i]) && !Player.list[i].isDead) {
+      if (self.map.id === Player.list[i].map.id && self.testCollision(Player.list[i]) && !Player.list[i].isDead) {
         self.owner = Player.list[i].id;
         Player.list[i].artifacts.push(self.name);
         // if artifact has magicAbility and player doesn't have that, add it
         if (
           self.magicAbility &&
           Player.list[i].firstSkills.find(e => e === self.magicAbility) ===
-            undefined
+          undefined
         )
           Player.list[i].firstSkills.push(self.magicAbility);
         self.toRemove = true;
@@ -31,15 +31,16 @@ Artifact = function(name, colX, rowY) {
       removePack.artifact.push(self.id);
     }
   };
-  self.getInitPack = function() {
+  self.getInitPack = function () {
     return {
       name: self.name,
       id: self.id,
       x: self.x,
-      y: self.y
+      y: self.y,
+      map: self.map.id,
     };
   };
-  self.getUpdatePack = function() {
+  self.getUpdatePack = function () {
     return {
       owner: self.owner,
       id: self.id,
@@ -52,7 +53,7 @@ Artifact = function(name, colX, rowY) {
 };
 artifactList = {};
 
-Artifact.getAllInitPack = function() {
+Artifact.getAllInitPack = function () {
   const artifacts = [];
   for (let i in artifactList) {
     artifacts.push(artifactList[i].getInitPack());
@@ -60,7 +61,7 @@ Artifact.getAllInitPack = function() {
   return artifacts;
 };
 
-Artifact.superUpdate = function() {
+Artifact.superUpdate = function () {
   const pack = [];
   for (let i in artifactList) {
     const artifact = artifactList[i];

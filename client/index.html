@@ -32,12 +32,24 @@
 <div id="dungeonMenu"
   style="width:100%;height:100%;color:azure; font-weight: bold; background-color: #222034;  display:none;">
   <div style="display:flex; width:100%; height:80%">
-    <div id="displayMapIcon" style="width:50%; margin:2%;height:80%; border:2px solid azure;"></div>
-    <div id="displayMap" style="width:50%; margin:2%; margin-bottom:0%;height:100%; border: 2px solid azure; "></div>
+    <div id="displayMapIcon"
+      style="width:50%; margin:2%;height:80%; border:2px solid azure;background-color:#222034; ; background-repeat: no-repeat;background-size: 100%; background-position: center;">
+    </div>
+    <div id="displayStructure"
+      style="width:50%; margin:2%; height:100%; border: 2px solid azure;background-color:#222034; ;background-repeat: no-repeat;background-size: 100%; background-position: center;  ">
+    </div>
   </div>
-  <button id="btnStartGame" style=" width:20%; height:8%; margin-left:65%; background-color: #d3d3d3;font-weight: bold;
+  <button id="btnStartGame" style=" width:20%; height:8%; margin-left:15%; background-color: #d3d3d3;font-weight: bold;
     font-size: large;border-radius: 3px;">Start
     Game</button>
+  <button id="btnLeftMap" style=" width:6%; height:5%; margin-left:69%; background-color: #d3d3d3;font-weight: bold;
+  font-size: large;border-radius: 3px;">
+    &#171;</button>
+  <button id="btnRightMap" style=" width:6%; height:5%; margin-left:3%; background-color: #d3d3d3;font-weight: bold;
+    font-size: large;border-radius: 3px;">
+    &#187;</button>
+
+
 
 </div>
 
@@ -100,13 +112,18 @@
   //.......Dungeon Menu................................................................................
   const dungeonMenu = document.getElementById("dungeonMenu");
   const displayMapIcon = document.getElementById("displayMapIcon");
-  const displayMap = document.getElementById("displayMap");
+  const displayStructure = document.getElementById("displayStructure");
   const btnStartGame = document.getElementById("btnStartGame")
+  const btnLeftMap = document.getElementById("btnLeftMap");
+  const btnRightMap = document.getElementById("btnRightMap")
+
+
   //......................................................................................................
   signDivSignIn.onclick = function () {
     socket.emit("signIn", {
       username: signDivUsername.value,
-      password: signDivPassword.value
+      password: signDivPassword.value,
+
     });
   };
 
@@ -139,12 +156,39 @@
     dungeonMenu.style.display = "inline-block";
   }
   btnStartGame.onclick = function () {
+    socket.emit("startGame", { currentMap: currentMap })
     dungeonMenu.style.display = "none";
     gameDiv.style.display = "inline-block";
   }
 
   //.......................................................................................................
+  //DungeonMenu buttons...................................................................................
 
+
+  let mapPool = ["Pyramid", "mainCamp"];
+  let currentMap = mapPool[0];
+  displayStructure.style.backgroundImage = `url(${Img[currentMap].src})`;
+  displayMapIcon.style.backgroundImage = `url(${Img[currentMap + "Icon"].src})`;
+  btnLeftMap.onclick = function () {
+    if (mapPool.indexOf(currentMap) === 0) {
+      currentMap = mapPool[mapPool.length - 1]
+    } else {
+      currentMap = mapPool[mapPool.indexOf(currentMap) - 1]
+    }
+    displayStructure.style.backgroundImage = `url(${Img[currentMap + "Structure"].src})`;
+    displayMapIcon.style.backgroundImage = `url(${Img[currentMap + "Icon"].src})`;
+  }
+  btnRightMap.onclick = function () {
+    if (mapPool.indexOf(currentMap) === mapPool.length - 1) {
+      currentMap = mapPool[0]
+    } else {
+      currentMap = mapPool[mapPool.indexOf(currentMap) + 1]
+    }
+    displayStructure.style.backgroundImage = `url(${Img[currentMap].src})`;
+    displayMapIcon.style.backgroundImage = `url(${Img[currentMap + "Icon"].src})`;
+  }
+
+  //....................................................................................................
   const chatText = document.getElementById("chat-text");
   const chatInput = document.getElementById("chat-input");
   const chatForm = document.getElementById("chat-form");
@@ -170,6 +214,7 @@
     self.firstSkill = "fireball";
     self.artifacts = [];
     self.armor = initPack.armor;
+    self.map = initPack.map
 
     self.updateUI = function () {
       firstSkill.style.backgroundImage = `url(${Img[self.firstSkill].src})`;
@@ -183,6 +228,7 @@
     };
     self.draw = function () {
       if (self.isDead) return;
+      if (Player.list[selfId].map !== self.map) { return }
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
 
@@ -255,6 +301,7 @@
         height * 1.2
       ); */
     };
+
     Player.list[self.id] = self;
     return self;
   };
@@ -275,7 +322,9 @@
     self.hp = initPack.hpMax;
     self.aimAngle = initPack.aimAngle;
     self.isCorpseDroped = false;
+    self.map = initPack.map
     self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
       let x = self.x - Player.list[selfId].x + WIDTH / 2 - self.width / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2 - self.height / 2;
 
@@ -334,11 +383,12 @@
     self.explosionframeCount = 0;
     self.isExplosion = false;
     self.type = initPack.type;
-
+    self.map = initPack.map
     self.draw = function () {
       if (self.x === null || self.y === null) {
         return;
       }
+      if (Player.list[selfId].map !== self.map) { return }
       let img = Img[self.type];
 
       const width = img.width / 2;
@@ -385,13 +435,16 @@
   //.................................................CORPSE...............................................//
   //......................................................................................................//
   //......................................................................................................//
-  const Corpse = function (x, y) {
+  const Corpse = function (x, y, map) {
     const self = {
       id: Math.random(),
       x: x,
-      y: y
+      y: y,
+      map: map
     };
     self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
+
       const x = self.x - Player.list[selfId].x + WIDTH / 2;
       const y = self.y - Player.list[selfId].y + HEIGHT / 2;
 
@@ -420,11 +473,13 @@
       id: initPack.id,
       x: initPack.x,
       y: initPack.y,
-      torchFrameCount: initPack.torchFrameCount
+      torchFrameCount: initPack.torchFrameCount,
+      map: initPack.map,
     };
     self.height = TILE_SIZE - 2;
     self.width = TILE_SIZE - 2;
     self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
       ctx.save();
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
@@ -463,16 +518,22 @@
 
   const Artifact = function (initPack) {
     const self = {
+
       name: initPack.name,
       id: initPack.id,
       x: initPack.x,
-      y: initPack.y
+      y: initPack.y,
+      map: initPack.map,
     };
+
     self.animeFrameCount = 0;
     self.height = TILE_SIZE - 2;
     self.width = TILE_SIZE - 2;
     self.img = Img[self.name];
     self.draw = function () {
+
+      if (Player.list[selfId].map !== self.map) { return }
+
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
 
@@ -490,12 +551,14 @@
         self.width / 1.2 + 2,
         self.height / 1.2 + 2
       );
+
     };
     self.update = function () {
       self.animeFrameCount += 4;
       if (self.animeFrameCount >= 126) {
         self.animeFrameCount = 0;
       }
+
       self.draw();
     };
 
@@ -511,7 +574,8 @@
     const self = {
       id: initPack.id,
       x: initPack.x,
-      y: initPack.y
+      y: initPack.y,
+      map: initPack.map
     };
 
     self.height = TILE_SIZE * 2 - 2;
@@ -520,6 +584,7 @@
     self.isTriggered = false;
     self.coffinframeCount = 0;
     self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
       let frameWidth = Img.coffin.width / 6;
@@ -615,7 +680,7 @@
           p.isDead = pack.isDead;
           if (p.isDead) {
             if (!p.isCorpseDroped);
-            Corpse(p.x, p.y);
+            Corpse(p.x, p.y, p.map);
             p.isCorpseDroped = true;
           }
         }
@@ -688,7 +753,7 @@
           }
           if (pack.toRemove) {
             if (!e.isCorpseDroped);
-            Corpse(e.x, e.y);
+            Corpse(e.x, e.y, e.map);
             e.isCorpseDroped = true;
           }
           if (pack.isAttacking !== undefined) {
@@ -759,13 +824,14 @@
   }, 40);
 
   const drawMap = function () {
-    let x = WIDTH / 2 - Player.list[selfId].x;
-    let y = HEIGHT / 2 - Player.list[selfId].y;
+    let player = Player.list[selfId]
+    let x = WIDTH / 2 - player.x;
+    let y = HEIGHT / 2 - player.y;
     let mapWidth = 45;
     let mapHeight = 46;
 
     ctx.drawImage(
-      Img.map,
+      Img[player.map],
       0,
       0,
       mapWidth * 48,
@@ -778,8 +844,8 @@
   };
 
   const drawScore = function () {
-    ctx.fillStyle = "white";
-    ctx.fillText(Player.list[selfId].score, 0, 30);
+    //  ctx.fillStyle = "white";
+    //  ctx.fillText(Player.list[selfId].score, 0, 30);
   };
   //....................................................................................................//
   socket.on("addToChat", function (data) {

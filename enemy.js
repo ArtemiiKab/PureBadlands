@@ -1,4 +1,4 @@
-Enemy = function (name, x, y, bulletType) {
+Enemy = function (name, x, y, bulletType, map) {
   const self = Entity();
   self.purpose = "enemy";
   self.id = Math.random();
@@ -8,7 +8,7 @@ Enemy = function (name, x, y, bulletType) {
   self.bulletType = bulletType;
   self.speed = 6;
   self.attackRecharge = 30;
-
+  self.map = map;
   self.width = 90;
   self.height = 90;
   self.aimAngle = 0;
@@ -16,7 +16,7 @@ Enemy = function (name, x, y, bulletType) {
   self.animeFrameCount = 0;
   self.isAttacking = false;
   self.attackCount = 0;
-
+  self.targetPlayer = { x: 0, y: 0 }
   self.hpMax = 10;
   self.hp = 10;
   self.observation = 8;
@@ -30,7 +30,8 @@ Enemy = function (name, x, y, bulletType) {
       width: self.width,
       height: self.height,
       hpMax: self.hpMax,
-      aimAngle: self.aimAngle
+      aimAngle: self.aimAngle,
+      map: self.map.id
     };
   };
   self.getUpdatePack = function () {
@@ -53,9 +54,9 @@ Enemy = function (name, x, y, bulletType) {
     let arr = [];
     let arr2 = [];
     for (let i in Player.list) {
-      if (!Player.list[i].isDead) {
+      if (self.map.id === Player.list[i].map.id && !Player.list[i].isDead) {
         arr.push([self.getDistance(Player.list[i]), Player.list[i].id]);
-      } else { return self.aimAngle }
+      }
     }
     arr.map(it => arr2.push(it[0]));
     let closestDist = Math.min(...arr2);
@@ -72,9 +73,8 @@ Enemy = function (name, x, y, bulletType) {
 
   self.performAttack = function () {
     if (self.attackCount > self.attackRecharge) {
-      let b = Bullet(self.id, self.bulletType, self.aimAngle, 100);
-      b.x = self.x;
-      b.y = self.y;
+      Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: self.bulletType, lifespan: 100, map: self.map });
+
       self.attackCount = 0;
       self.isAttacking = true;
     }
@@ -85,9 +85,7 @@ Enemy = function (name, x, y, bulletType) {
   };
   self.updatePosition = function () {
     self.attackCount++;
-    for (let i in Player.list) {
-      if (Player.list[i].isDead) { return }
-    }
+
     //if the enemy doesn't see player  he doesn't move
     if (self.getDistance(self.targetPlayer) > TILE_SIZE * self.observation) {
       return;
@@ -109,30 +107,30 @@ Enemy = function (name, x, y, bulletType) {
 
     if (
       diffX > self.speed / 2 + 0.1 &&
-      !currentMap.isPositionWall(self.bumperRight)
+      !self.map.isPositionWall(self.bumperRight)
     ) {
       self.x += self.speed;
     } else if (
       diffX < -(self.speed / 2 + 0.1) &&
-      !currentMap.isPositionWall(self.bumperLeft)
+      !self.map.isPositionWall(self.bumperLeft)
     ) {
       self.x -= self.speed;
     }
     if (
       diffY > self.speed / 2 + 0.1 &&
-      !currentMap.isPositionWall(self.bumperDown)
+      !self.map.isPositionWall(self.bumperDown)
     ) {
       self.y += self.speed;
     } else if (
       diffY < -(self.speed / 2 + 0.1) &&
-      !currentMap.isPositionWall(self.bumperUp)
+      !self.map.isPositionWall(self.bumperUp)
     ) {
       self.y -= self.speed;
     }
   };
 
   self.update = function () {
-    if (playerCounter === 0) {
+    if (playerCounter[self.map.id] === 0) {
       return
     }
     self.updateAim();

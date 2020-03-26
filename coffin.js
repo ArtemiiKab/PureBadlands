@@ -1,10 +1,10 @@
-Coffin = function (colX, rowY) {
+Coffin = function (colX, rowY, map) {
   const self = Entity();
   let habitans = ["skeletonRogue", "Mummy"];
   self.id = Math.random();
   self.x = colX * TILE_SIZE + TILE_SIZE;
   self.y = rowY * TILE_SIZE + TILE_SIZE;
-
+  self.map = map;
   self.height = TILE_SIZE * 2 - 2;
   self.width = TILE_SIZE * 2 - 2;
   self.isAwaken = false;
@@ -23,24 +23,26 @@ Coffin = function (colX, rowY) {
           habitans[Math.floor(Math.random() * habitans.length)],
           self.x + TILE_SIZE / 2,
           self.y - TILE_SIZE / 2,
-          "frostball"
+          "frostball", self.map
         );
         //self.isAwaken = true;
       }
     }
     for (let i in Player.list) {
       let player = Player.list[i];
+      if (self.map.id === player.map.id) {
 
-      if (
-        self.testCollision({
-          x: player.x + TILE_SIZE / 2,
-          y: player.y + player.height / 2,
-          width: 1,
-          height: 1
-        }) &&
-        !self.isTriggered
-      ) {
-        self.isTriggered = true;
+        if (
+          self.testCollision({
+            x: player.x + TILE_SIZE / 2,
+            y: player.y + player.height / 2,
+            width: 1,
+            height: 1
+          }) &&
+          !self.isTriggered
+        ) {
+          self.isTriggered = true;
+        }
       }
     }
   };
@@ -57,7 +59,8 @@ Coffin = function (colX, rowY) {
     return {
       id: self.id,
       x: self.x,
-      y: self.y
+      y: self.y,
+      map: self.map.id
     };
   };
 

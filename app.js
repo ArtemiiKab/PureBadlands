@@ -31,8 +31,10 @@ require("./artifact");
 require("./map");
 require("./player");
 require("./enemy");
-Player.onConnect = function (socket) {
-  const player = Player(socket.id);
+Player.onConnect = function (socket, map) {
+
+
+  const player = Player({ id: socket.id, map: mapList[map] });
   socket.on("keyPress", function (data) {
     if (data.inputId === "left") player.pressingLeft = data.state;
     else if (data.inputId === "right") player.pressingRight = data.state;
@@ -55,6 +57,8 @@ Player.onConnect = function (socket) {
     }
   });
 
+
+
   socket.emit("init", {
     selfId: socket.id,
     player: Player.getAllInitPack(),
@@ -67,6 +71,9 @@ Player.onConnect = function (socket) {
 };
 
 Player.onDisconnect = function (socket) {
+  if (Player.list[socket.id] !== undefined)
+    playerCounter[Player.list[socket.id].map.id] -= 1;
+
   delete Player.list[socket.id];
   removePack.player.push(socket.id);
 };
@@ -122,7 +129,7 @@ io.sockets.on("connection", function (socket) {
   socket.on("signIn", function (data) {
     isValidPassword(data, function (res) {
       if (res) {
-        Player.onConnect(socket);
+        // Player.onConnect(socket, data.currentMap);
         socket.emit("signInResponse", { success: true });
       } else {
         socket.emit("signInResponse", { success: false });
@@ -141,9 +148,11 @@ io.sockets.on("connection", function (socket) {
       }
     });
   });
-
+  socket.on("startGame", function (data) {
+    Player.onConnect(socket, data.currentMap);
+  })
   socket.on("disconnect", function () {
-    playerCounter -= 1;
+
     delete SOCKET_LIST[socket.id];
     Player.onDisconnect(socket);
   });

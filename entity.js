@@ -1,23 +1,39 @@
-Entity = function() {
+Entity = function (param) {
   const self = {
     x: null,
     y: null,
     spdX: 0,
     spdY: 0,
-    id: ""
+    id: "",
+
   };
 
-  self.update = function() {
+  if (param) {
+    if (param.x) {
+      self.x = param.x
+    }
+    if (param.y) {
+      self.y = param.y
+    }
+    if (param.map) {
+      self.map = param.map
+    }
+    if (param.id) {
+      self.id = param.id
+    }
+  }
+
+  self.update = function () {
     self.updatePosition();
   };
 
-  self.updatePosition = function() {
+  self.updatePosition = function () {
     if (self.x !== null) {
       self.x += self.spdX;
       self.y += self.spdY;
     }
   };
-  self.testCollision = function(entity2) {
+  self.testCollision = function (entity2) {
     const rect1 = {
       x: self.x - self.width / 2,
       y: self.y - self.height / 2,
@@ -33,11 +49,11 @@ Entity = function() {
     return self.testCollisionRectRect(rect1, rect2);
   };
 
-  self.getDistance = function(pt) {
+  self.getDistance = function (pt) {
     return Math.sqrt(Math.pow(self.x - pt.x, 2) + Math.pow(self.y - pt.y, 2));
   };
 
-  self.testCollisionRectRect = function(rect1, rect2) {
+  self.testCollisionRectRect = function (rect1, rect2) {
     return (
       rect1.x <= rect2.x + rect2.width &&
       rect2.x <= rect1.x + rect1.width &&

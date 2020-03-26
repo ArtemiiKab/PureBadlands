@@ -1,4 +1,4 @@
-Maps = function(id, imgSrc, grid) {
+Maps = function (id, imgSrc, grid) {
   const self = {
     id: id,
     image: imgSrc,
@@ -7,40 +7,40 @@ Maps = function(id, imgSrc, grid) {
     grid: grid
   };
 
-  self.generateCoffins = function() {
+  self.generateCoffins = function () {
     for (let i = 0; i < self.grid.length; i++) {
       for (let i2 = 0; i2 < self.grid[0].length; i2++) {
         if (self.grid[i][i2] === 4) {
-          new Coffin(i2, i);
+          new Coffin(i2, i, self);
         }
       }
     }
   };
 
   self.generateCoffins();
-  self.generateTorches = function() {
+  self.generateTorches = function () {
     for (let i = 0; i < self.grid.length; i++) {
       for (let i2 = 0; i2 < self.grid[0].length; i2++) {
         if (self.grid[i][i2] === 6) {
-          new Torch(i2, i);
+          new Torch(i2, i, self);
         }
       }
     }
   };
 
   self.generateTorches();
-  self.generateArtifacts = function() {
+  self.generateArtifacts = function () {
     for (let i = 0; i < self.grid.length; i++) {
       for (let i2 = 0; i2 < self.grid[0].length; i2++) {
         if (self.grid[i][i2] === 1.1) {
-          new Artifact("darkBook", i2, i);
+          new Artifact("darkBook", i2, i, self);
         }
       }
     }
   };
 
   self.generateArtifacts();
-  self.isPositionWall = function(pt) {
+  self.isPositionWall = function (pt) {
     let gridX = Math.floor(pt.x / TILE_SIZE);
     let gridY = Math.floor(pt.y / TILE_SIZE);
     if (gridX < 0 || gridX >= self.grid[0].length) {
@@ -67,7 +67,7 @@ Maps = function(id, imgSrc, grid) {
 };
 mapList = {};
 
-Maps("mainCamp", "img/newMap.png", [
+Maps("mainCamp", "img/mainCamp.png", [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
