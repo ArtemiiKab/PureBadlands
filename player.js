@@ -30,6 +30,7 @@ Player = function (param) {
   self.isDead = false;
   //lower better
   self.attackRecharge = 15;
+  self.specialAttackRecharge = 20
 
   self.deadTimer = 0;
   //closes
@@ -41,25 +42,33 @@ Player = function (param) {
   };
 
   //stats
-  self.maxSpd = 10;
+  self.speed = 10;
+
   self.hp = 10;
   self.hpMax = 10;
   self.firstSkill = "fireball";
   self.firstSkills = ["fireball", "frostball"];
+  self.specialSkills = ["Entangle"]
+  self.specialSkill = self.specialSkills[0]
   //animation
   self.spriteAnimeCounter = 0;
   const super_update = self.update;
   self.update = function () {
-    self.attackCounter++
+
+    self.attackCounter++;
     self.updateSpd();
     super_update();
     if (self.pressingAttack && self.attackCounter > self.attackRecharge && !self.isDead) {
       self.shootBullet(self.mouseAngle);
       self.attackCounter = 0;
     }
+    if (self.pressingRightClick && self.attackCounter > self.specialAttackRecharge && !self.isDead) {
+      self.shootSpecialAttack();
+      self.attackCounter = 0;
+    }
     if (self.isDead) {
       self.deadTimer++;
-      self.maxSpd = 0;
+      self.speed = 0;
       if (self.artifacts.length !== 0) {
         for (let i = 0; i < self.artifacts.length; i++) {
           self.dropArtifacts(self.artifacts[i]);
@@ -72,7 +81,7 @@ Player = function (param) {
         self.x = 500;
         self.y = 500;
         self.hp = self.hpMax;
-        self.maxSpd = 10;
+        self.speed = 10;
       }
     }
   };
@@ -89,31 +98,41 @@ Player = function (param) {
 
   self.shootBullet = function (angle) {
     Bullet({ parent: self.id, angle: angle, x: self.x, y: self.y, bulletType: self.firstSkill, lifespan: 100, map: self.map });
+    // Spell(self.mouseX + self.x, self.mouseY + self.y, self.specialSkill, spellBook[self.specialSkill], self.map);
+    self.pressingAttack = false;
+    console.log(spellBook[self.specialSkill])
   };
+
+  self.shootSpecialAttack = function () {
+    Spell(self.mouseX + self.x, self.mouseY + self.y, self.specialSkill, spellBook[self.specialSkill], self.map);
+    self.pressingRightClick = false;
+  }
   self.updateSpd = function () {
+
     self.bumperRight = { x: self.x + self.width / 2, y: self.y };
     self.bumperLeft = { x: self.x - self.width / 2, y: self.y };
     self.bumperUp = { x: self.x, y: self.y - self.height / 2 };
     self.bumperDown = { x: self.x, y: self.y + self.height / 2 };
 
     if (self.pressingRight && !self.map.isPositionWall(self.bumperRight)) {
-      self.spdX = self.maxSpd;
+      self.spdX = self.speed;
       self.spriteAnimeCounter += 0.2;
     } else if (
       self.pressingLeft &&
       !self.map.isPositionWall(self.bumperLeft)
     ) {
-      self.spdX = -self.maxSpd;
+      self.spdX = -self.speed;
       self.spriteAnimeCounter += 0.2;
     } else self.spdX = 0;
 
     if (self.pressingDown && !self.map.isPositionWall(self.bumperDown)) {
-      self.spdY = self.maxSpd;
+      self.spdY = self.speed;
       self.spriteAnimeCounter += 0.2;
     } else if (self.pressingUp && !self.map.isPositionWall(self.bumperUp)) {
-      self.spdY = -self.maxSpd;
+      self.spdY = -self.speed;
       self.spriteAnimeCounter += 0.2;
     } else self.spdY = 0;
+
   };
 
   self.getInitPack = function () {

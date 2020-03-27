@@ -620,7 +620,44 @@
     return self;
   };
   const coffinList = {};
+  //............................................SPELL...................................................
+  //...................................................................................................
+  //..................................................................................................... 
+  const Spell = function (initPack) {
+    const self = {
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y,
+      name: initPack.name,
+      map: initPack.map
+    }
+    self.width = 96;
+    self.height = 96;
+    self.spellFrameCount = 0;
+    self.img = Img[self.name];
 
+    self.draw = function () {
+
+      let x = self.x - Player.list[selfId].x + WIDTH / 2
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2
+
+      let frameWidth = self.img.width / 6;
+      let walk = Math.floor(self.spellFrameCount / 25)
+
+      ctx.drawImage(self.img, walk * frameWidth, 0, frameWidth, frameWidth, x, y, self.width, self.height)
+      self.spellFrameCount += 4;
+      if (self.spellFrameCount > 126) {
+        self.spellFrameCount = 50
+      }
+
+    }
+
+
+
+    spellList[self.id] = self
+    return self
+  }
+  const spellList = {}
   //............................................SOCKETS................................................//
   //...................................................................................................//
   //...................................................................................................//
@@ -646,6 +683,9 @@
     }
     for (let i = 0; i < data.artifact.length; i++) {
       new Artifact(data.artifact[i]);
+    }
+    for (let i = 0; i < data.spell.length; i++) {
+      new Spell(data.spell[i]);
     }
   });
 
@@ -770,6 +810,19 @@
           }
         }
       }
+      for (let i = 0; i < data.spell.length; i++) {
+        const pack = data.spell[i];
+        const s = spellList[data.spell[i].id];
+
+        if (s) {
+          if (pack.x !== undefined) {
+
+            s.x = pack.x;
+            s.y = pack.y;
+          }
+
+        }
+      }
     }
   });
 
@@ -787,6 +840,9 @@
     }
     for (let i = 0; i < data.artifact.length; i++) {
       delete artifactList[data.artifact[i]];
+    }
+    for (let i = 0; i < data.spell.length; i++) {
+      delete spellList[data.spell[i]];
     }
   });
 
@@ -820,6 +876,9 @@
     }
     for (let i in Bullet.list) {
       Bullet.list[i].draw();
+    }
+    for (let i in spellList) {
+      spellList[i].draw();
     }
   }, 40);
 
@@ -900,13 +959,22 @@
       socket.emit("keyPress", { inputId: "up", state: false });
   };
 
-  document.onmousedown = function (event) {
+
+  //......................MOUSE ACTIONS.............................................................
+
+  document.onclick = function () {
     if (selfId && !Player.list[selfId].isDead)
       socket.emit("keyPress", { inputId: "attack", state: true });
   };
-  document.onmouseup = function (event) {
-    socket.emit("keyPress", { inputId: "attack", state: false });
-  };
+  // document.onmouseup = function (event) {
+  //   socket.emit("keyPress", { inputId: "attack", state: false });
+  // };
+
+  document.oncontextmenu = function (mouse) {
+
+    socket.emit("keyPress", { inputId: "rightClick", state: true })
+    mouse.preventDefault();
+  }
 
   document.onmousemove = function (event) {
     let x =
@@ -918,6 +986,6 @@
       event.clientY -
       document.getElementById("ctx").getBoundingClientRect().top - CANVAS_HEIGHT / 2;
     let angle = (Math.atan2(y, x) / Math.PI) * 180;
-    socket.emit("keyPress", { inputId: "mouseAngle", state: angle });
+    socket.emit("keyPress", { inputId: "mouseAngle", state: angle, x: x, y: y });
   };
 </script>

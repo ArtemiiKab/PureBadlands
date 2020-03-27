@@ -5,7 +5,7 @@ Entity = function (param) {
     spdX: 0,
     spdY: 0,
     id: "",
-
+    idDead: false
   };
 
   if (param) {
@@ -28,7 +28,7 @@ Entity = function (param) {
   };
 
   self.updatePosition = function () {
-    if (self.x !== null) {
+    if (self.x !== null && !self.isDead) {
       self.x += self.spdX;
       self.y += self.spdY;
     }

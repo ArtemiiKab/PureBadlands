@@ -20,17 +20,20 @@ initPack = {
   torch: [],
   coffin: [],
   enemy: [],
-  artifact: []
+  artifact: [],
+  spell: []
 };
 
-removePack = { player: [], bullet: [], enemy: [], artifact: [] };
+removePack = { player: [], bullet: [], enemy: [], artifact: [], spell: [] };
 require("./entity");
 require("./torch");
 require("./coffin");
 require("./artifact");
 require("./map");
+require("./spellBook")
 require("./player");
 require("./enemy");
+require("./spell")
 Player.onConnect = function (socket, map) {
 
 
@@ -41,7 +44,15 @@ Player.onConnect = function (socket, map) {
     else if (data.inputId === "down") player.pressingDown = data.state;
     else if (data.inputId === "up") player.pressingUp = data.state;
     else if (data.inputId === "attack") player.pressingAttack = data.state;
-    else if (data.inputId === "mouseAngle") player.mouseAngle = data.state;
+    else if (data.inputId === "mouseAngle") {
+      player.mouseAngle = data.state;
+      player.mouseX = data.x;
+      player.mouseY = data.y;
+
+    }
+    else if (data.inputId === "rightClick") {
+      player.pressingRightClick = true;
+    }
   });
   socket.on("changeSkill", function (data) {
     if (data.inputId === "1") {
@@ -66,7 +77,8 @@ Player.onConnect = function (socket, map) {
     torch: Torch.getAllInitPack(),
     coffin: Coffin.getAllInitPack(),
     enemy: Enemy.getAllInitPack(),
-    artifact: Artifact.getAllInitPack()
+    artifact: Artifact.getAllInitPack(),
+    spell: Spell.getAllInitPack()
   });
 };
 
@@ -177,8 +189,9 @@ setInterval(function () {
     bullet: Bullet.update(),
     coffin: Coffin.superUpdate(),
     enemy: Enemy.superUpdate(),
-    artifact: Artifact.superUpdate()
-    //artifact: Artifact.update()
+    artifact: Artifact.superUpdate(),
+    spell: Spell.superUpdate()
+
   };
 
   for (let i in SOCKET_LIST) {
@@ -193,8 +206,10 @@ setInterval(function () {
   initPack.torch = [];
   initPack.coffin = [];
   initPack.artifact = [];
+  initPack.spell = [];
   removePack.player = [];
   removePack.bullet = [];
   removePack.enemy = [];
   removePack.artifact = [];
+  removePack.spell = [];
 }, 1000 / 25);

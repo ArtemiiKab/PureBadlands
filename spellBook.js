@@ -1,0 +1,1 @@
+spellBook = { Entangle: { stat: "speed", effect: 0, operator: "*", duration: 126 * 3, applies: 1 } };

@@ -124,3 +124,7 @@ Img.darkBook = new Image();
 Img.darkBook.src = "/client/img/extrasPyramid/darkBook.png";
 Img.darkBookIcon = new Image();
 Img.darkBookIcon.src = "/client/img/extrasPyramid/darkBookIcon.png";
+//................................SPELLS.......................................... 
+// Druid........................................................................ 
+Img.Entangle = new Image();
+Img.Entangle.src = "/client/img/spells/EntangleWoods.png"
