@@ -44,7 +44,7 @@ Player = function (param) {
   //stats
   self.speed = 10;
 
-  self.hp = 10;
+  self.hp = 100;
   self.hpMax = 10;
   self.firstSkill = "fireball";
   self.firstSkills = ["fireball", "frostball"];
