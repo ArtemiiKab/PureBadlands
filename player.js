@@ -28,9 +28,11 @@ Player = function (param) {
   self.attackCounter = 0
   self.artifacts = [];
   self.isDead = false;
+  self.transformed = "no"
   //lower better
   self.attackRecharge = 15;
   self.specialAttackRecharge = 20
+
 
   self.deadTimer = 0;
   //closes
@@ -45,10 +47,10 @@ Player = function (param) {
   self.speed = 10;
 
   self.hp = 100;
-  self.hpMax = 10;
+  self.hpMax = 100;
   self.firstSkill = "fireball";
   self.firstSkills = ["fireball", "frostball"];
-  self.specialSkills = ["Entangle"]
+  self.specialSkills = ["EldrichGrasp", "Entangle", "ChickenPolymorf", "LightningBolt"]
   self.specialSkill = self.specialSkills[0]
   //animation
   self.spriteAnimeCounter = 0;
@@ -58,14 +60,17 @@ Player = function (param) {
     self.attackCounter++;
     self.updateSpd();
     super_update();
-    if (self.pressingAttack && self.attackCounter > self.attackRecharge && !self.isDead) {
-      self.shootBullet(self.mouseAngle);
-      self.attackCounter = 0;
+    if (self.transformed === "no") {
+      if (self.pressingAttack && self.attackCounter > self.attackRecharge && !self.isDead) {
+        self.shootBullet(self.mouseAngle);
+        self.attackCounter = 0;
+      }
+      if (self.pressingRightClick && self.attackCounter > self.specialAttackRecharge && !self.isDead) {
+        self.shootSpecialAttack();
+        self.attackCounter = 0;
+      }
     }
-    if (self.pressingRightClick && self.attackCounter > self.specialAttackRecharge && !self.isDead) {
-      self.shootSpecialAttack();
-      self.attackCounter = 0;
-    }
+
     if (self.isDead) {
       self.deadTimer++;
       self.speed = 0;
@@ -161,8 +166,10 @@ Player = function (param) {
       spriteAnimeCounter: self.spriteAnimeCounter,
       isDead: self.isDead,
       firstSkill: self.firstSkill,
+      specialSkill: self.specialSkill,
       artifacts: self.artifacts,
-      armor: self.armor
+      armor: self.armor,
+      transformed: self.transformed
     };
   };
   Player.list[self.id] = self;

@@ -128,3 +128,22 @@ Img.darkBookIcon.src = "/client/img/extrasPyramid/darkBookIcon.png";
 // Druid........................................................................ 
 Img.Entangle = new Image();
 Img.Entangle.src = "/client/img/spells/EntangleWoods.png"
+Img.EldrichGrasp = new Image();
+Img.EldrichGrasp.src = "/client/img/spells/EldrichGrasp.png"
+Img.Chicken = new Image();
+Img.Chicken.src = "/client/img/spells/chicken.png";
+Img.LightningBolt = new Image();
+Img.LightningBolt.src = "/client/img/spells/LightningBolt.png"
+
+//...................................ICONS.......................................... 
+Img.EntangleIcon = new Image();
+Img.EntangleIcon.src = "/client/img/icons/EntangleIcon.png";
+
+Img.EldrichGraspIcon = new Image();
+Img.EldrichGraspIcon.src = "/client/img/icons/EldrichGraspIcon.png";
+
+Img.ChickenPolymorfIcon = new Image();
+Img.ChickenPolymorfIcon.src = "/client/img/icons/ChickenIcon.png";
+
+Img.LightningBoltIcon = new Image();
+Img.LightningBoltIcon.src = "/client/img/icons/LightningIcon.png";

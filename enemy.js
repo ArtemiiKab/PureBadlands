@@ -20,6 +20,7 @@ Enemy = function (name, x, y, bulletType, map) {
   self.hpMax = 10;
   self.hp = 10;
   self.observation = 8;
+  self.transformed = "no";
 
   self.getInitPack = function () {
     return {
@@ -43,7 +44,8 @@ Enemy = function (name, x, y, bulletType, map) {
       toRemove: self.toRemove,
       animeFrameCount: self.animeFrameCount,
       aimAngle: self.aimAngle,
-      isAttacking: self.isAttacking
+      isAttacking: self.isAttacking,
+      transformed: self.transformed
     };
   };
 
@@ -72,7 +74,7 @@ Enemy = function (name, x, y, bulletType, map) {
   };
 
   self.performAttack = function () {
-    if (self.attackCount > self.attackRecharge) {
+    if (self.attackCount > self.attackRecharge && self.transformed === "no") {
       Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: self.bulletType, lifespan: 100, map: self.map });
 
       self.attackCount = 0;
@@ -83,6 +85,7 @@ Enemy = function (name, x, y, bulletType, map) {
       self.isAttacking = false;
     }
   };
+
   self.updatePosition = function () {
     self.attackCount++;
 
@@ -132,6 +135,9 @@ Enemy = function (name, x, y, bulletType, map) {
   self.update = function () {
     if (playerCounter[self.map.id] === 0) {
       return
+    }
+    if (self.hp <= 0) {
+      self.toRemove = true;
     }
     self.updateAim();
     self.updatePosition();

@@ -61,6 +61,8 @@
   </canvas>
   <div id="firstSkill" style="position:absolute; top:88%; left:3%; width:5%; height:9%; border: 3px solid azure; background-color:#222034;  background-size:100%;
       background-repeat: no-repeat; z-index:100;"></div>
+  <div id="secondSkill" style="position:absolute; top:88%; left:11%; width:5%; height:9%; border: 3px solid azure; background-color:#222034;  background-size:100%;
+       background-repeat: no-repeat; z-index:100;"></div>
   <div id="artifactList"
     style="position:absolute; top:88%; left:75%;width:15%;height:9%; border: 3px solid azure; background-color:#222034;">
   </div>
@@ -103,6 +105,7 @@
   const signDivPassword = document.getElementById("signDiv-password");
   const gameDiv = document.getElementById("gameDiv");
   const firstSkill = document.getElementById("firstSkill");
+  const secondSkill = document.getElementById("secondSkill");
   const artifactDisplay = document.getElementById("artifactList");
 
   //.............................MAIN MENU.............................................................
@@ -212,12 +215,14 @@
     self.isDead = false;
     self.isCorpseDroped = false;
     self.firstSkill = "fireball";
+    self.secondSkill = "Entangle";
     self.artifacts = [];
     self.armor = initPack.armor;
     self.map = initPack.map
-
+    self.transformed = "no"
     self.updateUI = function () {
       firstSkill.style.backgroundImage = `url(${Img[self.firstSkill].src})`;
+      secondSkill.style.backgroundImage = `url(${Img[self.secondSkill + "Icon"].src})`;
 
       artifactDisplay.innerHTML = "";
       for (let i = 0; i < self.artifacts.length; i++) {
@@ -232,14 +237,14 @@
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
 
-      const hpWidth = (1 * self.hp) / self.hpMax;
+      const hpWidth = (50 * self.hp) / self.hpMax;
       ctx.fillStyle = "red";
-      ctx.fillRect(x - hpWidth / 3, y - 52, hpWidth, 10);
+      ctx.fillRect(x - hpWidth / 2.5, y - 52, hpWidth, 10);
 
-      const width = 90; // player size
-      const height = 90;
-      const frameWidth = 144 / 3; //depends on your sprite
-      const frameHeight = 192 / 4;
+      let width = 90; // player size
+      let height = 90;
+      let frameWidth = 144 / 3; //depends on your sprite
+      let frameHeight = 192 / 4;
       let walkingMod = Math.floor(self.spriteAnimeCounter) % 3;
 
       let aimAngle = self.mouseAngle;
@@ -259,7 +264,18 @@
       }
       let arr = ["BodyNone", "BootsNone", "HelmetNone", "WeaponNone"];
       let arr2 = Object.values(self.armor);
-
+      if (self.transformed !== "no") {
+        arr = [];
+        arr2 = [self.transformed];
+        self.img = Img[self.transformed]
+        frameWidth = self.img.width / 3;
+        frameHeight = self.img.height / 4;
+        width = self.img.width / 3;
+        height = self.img.height / 4;
+      } else {
+        width = 90
+        height = 90
+      }
       for (let i in arr) {
         ctx.drawImage(
           Img[self.race + arr[i]],
@@ -322,9 +338,11 @@
     self.hp = initPack.hpMax;
     self.aimAngle = initPack.aimAngle;
     self.isCorpseDroped = false;
-    self.map = initPack.map
+    self.map = initPack.map;
+    self.transformed = "no";
     self.draw = function () {
       if (Player.list[selfId].map !== self.map) { return }
+
       let x = self.x - Player.list[selfId].x + WIDTH / 2 - self.width / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2 - self.height / 2;
 
@@ -355,6 +373,17 @@
       self.img = Img[self.name];
       if (self.isAttacking) {
         self.img = Img[self.name + "Attack"];
+      }
+      if (self.transformed !== "no") {
+        self.img = Img[self.transformed];
+        frameWidth = self.img.width / 3;
+        frameHeight = self.img.height / 4;
+        self.width = self.img.width / 3;
+        self.height = self.img.height / 4;
+
+      } else {
+        self.width = initPack.width;
+        self.height = initPack.height
       }
       ctx.drawImage(
         self.img,
@@ -629,7 +658,8 @@
       x: initPack.x,
       y: initPack.y,
       name: initPack.name,
-      map: initPack.map
+      map: initPack.map,
+      isTransformed: initPack.isTransformed
     }
     self.width = 96;
     self.height = 96;
@@ -637,16 +667,23 @@
     self.img = Img[self.name];
 
     self.draw = function () {
+      if (self.isTransformed === "transformed") { return }
 
       let x = self.x - Player.list[selfId].x + WIDTH / 2
       let y = self.y - Player.list[selfId].y + HEIGHT / 2
 
       let frameWidth = self.img.width / 6;
+      if (self.name === "LightningBolt") {
+        frameWidth = self.img.width / 12;
+        self.width = TILE_SIZE * 1.5
+        x -= TILE_SIZE / 2;
+        y -= TILE_SIZE / 2
+      }
       let walk = Math.floor(self.spellFrameCount / 25)
 
       ctx.drawImage(self.img, walk * frameWidth, 0, frameWidth, frameWidth, x, y, self.width, self.height)
-      self.spellFrameCount += 4;
-      if (self.spellFrameCount > 126) {
+      self.spellFrameCount += 8;
+      if (self.spellFrameCount > 126 && self.name !== "LightningBolt") {
         self.spellFrameCount = 50
       }
 
@@ -727,12 +764,19 @@
         if (pack.firstSkill !== undefined) {
           p.firstSkill = pack.firstSkill;
         }
+
+        if (pack.specialSkill !== undefined) {
+          p.secondSkill = pack.specialSkill;
+        }
         if (pack.artifacts !== undefined) {
           p.artifacts = pack.artifacts;
         }
 
         if (pack.armor !== undefined) {
           p.armor = pack.armor;
+        }
+        if (pack.transformed) {
+          p.transformed = pack.transformed
         }
       }
 
@@ -798,6 +842,10 @@
           }
           if (pack.isAttacking !== undefined) {
             e.isAttacking = pack.isAttacking;
+          }
+
+          if (pack.transformed) {
+            e.transformed = pack.transformed
           }
         }
       }
@@ -941,6 +989,10 @@
       else if (event.keyCode === 49)
         //1
         socket.emit("changeSkill", { inputId: "1" });
+
+      else if (event.keyCode === 50)
+        //2 
+        socket.emit("changeSkill", { inputId: "2" })
     }
   };
 

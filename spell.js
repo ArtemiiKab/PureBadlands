@@ -16,16 +16,21 @@ Spell = function (x, y, name, power, map) {
     self.applies = self.power.applies
 
     self.applyMagicEffect = function (actor) {
+        self.revertTargetStat = actor[self.power.stat]
         if (self.power.operator === "*") {
-            self.revertTargetStat = actor[self.power.stat]
             actor[self.power.stat] = actor[self.power.stat] * self.power.effect
+        } else if (self.power.operator === "=") {
+            actor[self.power.stat] = self.power.effect
+        } else if (self.power.operator === "-") {
+            actor[self.power.stat] = actor[self.power.stat] - self.power.effect
         }
 
 
     }
 
     self.revertEffect = function (actor) {
-        actor[self.power.stat] = self.revertTargetStat
+        if (self.power.stat !== "hp")
+            actor[self.power.stat] = self.revertTargetStat
     }
 
     self.update = function () {
@@ -37,11 +42,13 @@ Spell = function (x, y, name, power, map) {
                 if (p.map.id === self.map.id && !p.isDead) {
 
                     if (p.testCollision(self) && self.applies > 0) {
+                        if (self.power.stat !== "hp") {
+                            self.x = p.x - p.width / 2;
+                            self.y = p.y - p.height / 4;
+                            self.applies -= 1;
+                        }
 
-                        self.x = p.x - p.width / 2;
-                        self.y = p.y - p.height / 4;
                         self.applyMagicEffect(p);
-                        self.applies -= 1;
                         self.target = p;
                     }
                 }
@@ -51,11 +58,14 @@ Spell = function (x, y, name, power, map) {
                 let e = enemyList[i];
                 if (e.map.id === self.map.id) {
                     if (e.testCollision(self) && self.applies > 0) {
-                        self.x = e.x - e.width / 2;
-                        self.y = e.y - e.height / 4;
+                        if (self.power.stat !== "hp") {
+                            self.x = e.x - e.width / 2;
+                            self.y = e.y - e.height / 4;
+                            self.applies -= 1;
+                        }
+
                         self.applyMagicEffect(e);
-                        self.applies -= 1;
-                        self.target = e
+                        self.target = e;
                     }
                 }
             }
@@ -89,7 +99,8 @@ Spell = function (x, y, name, power, map) {
             x: self.x,
             y: self.y,
             name: self.name,
-            map: self.map.id
+            map: self.map.id,
+            isTransformed: self.power.stat
         };
     };
 

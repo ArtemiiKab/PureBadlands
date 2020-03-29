@@ -65,6 +65,12 @@ Player.onConnect = function (socket, map) {
       } else {
         player.firstSkill = player.firstSkills[0];
       }
+    } else if (data.inputId === "2") {
+      if (player.specialSkills.indexOf(player.specialSkill) < player.specialSkills.length - 1) {
+        player.specialSkill = player.specialSkills[player.specialSkills.indexOf(player.specialSkill) + 1]
+      } else[
+        player.specialSkill = player.specialSkills[0]
+      ]
     }
   });
 
