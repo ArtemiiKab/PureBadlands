@@ -1,24 +1,25 @@
-Enemy = function (name, x, y, bulletType, map) {
+Enemy = function (enemyPack, x, y, map) {
   const self = Entity();
   self.purpose = "enemy";
   self.id = Math.random();
-  self.name = name;
+  self.name = enemyPack.name;
+  self.width = enemyPack.width;
+  self.height = enemyPack.width;
+  self.bulletType = enemyPack.bulletType;
+  self.speed = enemyPack.speed;
+  self.hpMax = enemyPack.hpMax;
+  self.hp = self.hpMax;
   self.x = x;
   self.y = y;
-  self.bulletType = bulletType;
-  self.speed = 6;
-  self.attackRecharge = 30;
   self.map = map;
-  self.width = 90;
-  self.height = 90;
+
+  self.attackRecharge = 30;
   self.aimAngle = 0;
   self.toRemove = false;
   self.animeFrameCount = 0;
   self.isAttacking = false;
   self.attackCount = 0;
   self.targetPlayer = { x: 0, y: 0 }
-  self.hpMax = 10;
-  self.hp = 10;
   self.observation = 8;
   self.transformed = "no";
 

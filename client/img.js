@@ -119,6 +119,12 @@ Img.Mummy.src = "/client/img/enemiesPyramid/Mummy.png";
 Img.MummyAttack = new Image();
 Img.MummyAttack.src = "/client/img/enemiesPyramid/MummyAttack.png";
 
+//BOSES........................................................................................... 
+Img.CrocDog = new Image();
+Img.CrocDog.src = "./client/img/enemiesPyramid/CrocDog.png";
+Img.CrocDogAttack = new Image();
+Img.CrocDogAttack.src = "./client/img/enemiesPyramid/CrocDog.png"
+
 //..............................................Artifacts............................................
 Img.darkBook = new Image();
 Img.darkBook.src = "/client/img/extrasPyramid/darkBook.png";

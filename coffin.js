@@ -20,10 +20,10 @@ Coffin = function (colX, rowY, map) {
 
       if (!self.isAwaken && enemyCounter <= 5) {
         Enemy(
-          habitans[Math.floor(Math.random() * habitans.length)],
+          enemyBook[habitans[Math.floor(Math.random() * habitans.length)]],
           self.x + TILE_SIZE / 2,
           self.y - TILE_SIZE / 2,
-          "frostball", self.map
+          self.map
         );
         //self.isAwaken = true;
       }

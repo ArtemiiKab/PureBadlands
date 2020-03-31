@@ -30,10 +30,19 @@ require("./torch");
 require("./coffin");
 require("./artifact");
 require("./map");
-require("./spellBook")
+require("./enemyBook");
+require("./spellBook");
 require("./player");
 require("./enemy");
-require("./spell")
+require("./spell");
+//call the dog boss................
+Enemy(
+  enemyBook.CrocDog,
+  2000,
+  2000,
+  mapList["Pyramid"]
+);
+//.................................
 Player.onConnect = function (socket, map) {
 
 
