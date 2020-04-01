@@ -12,7 +12,7 @@ Player = function (param) {
   ];
   let armor = ["WolfArmor", "RustyArmor", "PharaonArmor", "None", "OsirisEye"];
   self.race = races[Math.floor(Math.random() * 2)];
-  self.x = 700;
+  self.x = 2000;
   self.y = 350;
 
   self.number = "" + Math.floor(10 * Math.random());
@@ -56,7 +56,9 @@ Player = function (param) {
   self.spriteAnimeCounter = 0;
   const super_update = self.update;
   self.update = function () {
-
+    if (self.hp <= 0) {
+      self.isDead = true;
+    }
     self.attackCounter++;
     self.updateSpd();
     super_update();
@@ -78,17 +80,19 @@ Player = function (param) {
         for (let i = 0; i < self.artifacts.length; i++) {
           self.dropArtifacts(self.artifacts[i]);
         }
+        self.artifacts = [];
+
       }
       if (self.deadTimer >= 50) {
         self.isDead = false;
 
         self.deadTimer = 0;
-        self.x = 500;
+        self.x = 2000;
         self.y = 500;
         self.hp = self.hpMax;
         self.speed = 10;
       }
-    }
+    } 7
   };
 
   self.dropArtifacts = function (name) {

@@ -25,15 +25,17 @@ initPack = {
 };
 
 removePack = { player: [], bullet: [], enemy: [], artifact: [], spell: [] };
+require("./enemyBook");
+require("./spellBook");
 require("./entity");
 require("./torch");
 require("./coffin");
 require("./artifact");
-require("./map");
-require("./enemyBook");
-require("./spellBook");
-require("./player");
 require("./enemy");
+require("./map");
+
+require("./player");
+
 require("./spell");
 //call the dog boss................
 Enemy(

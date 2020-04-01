@@ -40,6 +40,18 @@ Maps = function (id, imgSrc, grid) {
   };
 
   self.generateArtifacts();
+
+  self.generateEnemies = function () {
+    for (let i = 0; i < self.grid.length; i++) {
+      for (let i2 = 0; i2 < self.grid[0].length; i2++) {
+        if (self.grid[i][i2] === 0.1) {
+          new Enemy(enemyBook["GoblinLightningCultist"], i2 * TILE_SIZE, i * TILE_SIZE, self);
+        }
+      }
+    }
+  };
+
+  self.generateEnemies()
   self.isPositionWall = function (pt) {
     let gridX = Math.floor(pt.x / TILE_SIZE);
     let gridY = Math.floor(pt.y / TILE_SIZE);
@@ -329,11 +341,11 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
+    0.1,
     1.1,
     0,
     0,
-    0,
+    0.1,
     0,
     0,
     0,
@@ -377,11 +389,11 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
+    0.1,
     0,
     0,
     0,
-    0,
-    0,
+    0.1,
     0,
     0,
     0,
@@ -425,11 +437,11 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
+    0.1,
     0,
     0,
     0,
-    0,
-    0,
+    0.1,
     0,
     0,
     0,
@@ -475,7 +487,7 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
+    0.1,
     0,
     0,
     0,

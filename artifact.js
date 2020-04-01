@@ -15,6 +15,7 @@ Artifact = function (name, colX, rowY, map) {
     for (let i in Player.list) {
       if (self.map.id === Player.list[i].map.id && self.testCollision(Player.list[i]) && !Player.list[i].isDead) {
         self.owner = Player.list[i].id;
+
         Player.list[i].artifacts.push(self.name);
         // if artifact has magicAbility and player doesn't have that, add it
         if (

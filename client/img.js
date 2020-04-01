@@ -108,16 +108,17 @@ Img.coffin.src = "/client/img/extrasPyramid/sarcofag.png";
 Img.skeletonRogue = new Image();
 Img.skeletonRogue.src = "/client/img/enemiesPyramid/skeletonRogue.png";
 Img.skeletonRogueAttack = new Image();
-Img.skeletonRogueAttack.src =
-  "/client/img/enemiesPyramid/skeletonRogueAttack.png";
-
-Img.sarcophagGuard = new Image();
-Img.sarcophagGuard.src = "/client/img/enemiesPyramid/sarcophagGuard.png";
+Img.skeletonRogueAttack.src = "/client/img/enemiesPyramid/skeletonRogueAttack.png";
 
 Img.Mummy = new Image();
 Img.Mummy.src = "/client/img/enemiesPyramid/Mummy.png";
 Img.MummyAttack = new Image();
 Img.MummyAttack.src = "/client/img/enemiesPyramid/MummyAttack.png";
+
+Img.GoblinLightningCultist = new Image();
+Img.GoblinLightningCultist.src = "/client/img/enemiesPyramid/GoblinLightningCultist.png";
+Img.GoblinLightningCultistAttack = new Image();
+Img.GoblinLightningCultistAttack.src = "/client/img/enemiesPyramid/GoblinLightningCultistAttack.png";
 
 //BOSES........................................................................................... 
 Img.CrocDog = new Image();

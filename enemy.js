@@ -20,7 +20,17 @@ Enemy = function (enemyPack, x, y, map) {
   self.isAttacking = false;
   self.attackCount = 0;
   self.targetPlayer = { x: 0, y: 0 }
-  self.observation = 8;
+  if (enemyPack.attention !== undefined) {
+    for (let i in artifactList) {
+      if (artifactList[i].name === enemyPack.attention) {
+        self.targetArtifact = artifactList[i]
+        self.targetPlayer = { x: self.targetArtifact.x, y: self.targetArtifact.y }
+      }
+    }
+
+  }
+
+  self.observation = enemyPack.observation;
   self.transformed = "no";
 
   self.getInitPack = function () {
@@ -51,23 +61,31 @@ Enemy = function (enemyPack, x, y, map) {
   };
 
   self.updateAim = function () {
-
-
-    //choosing the nearest player...........................
-    let arr = [];
-    let arr2 = [];
-    for (let i in Player.list) {
-      if (self.map.id === Player.list[i].map.id && !Player.list[i].isDead) {
-        arr.push([self.getDistance(Player.list[i]), Player.list[i].id]);
+    if (self.observation !== 0) {
+      //choosing the nearest player...........................
+      let arr = [];
+      let arr2 = [];
+      for (let i in Player.list) {
+        if (self.map.id === Player.list[i].map.id && !Player.list[i].isDead) {
+          arr.push([self.getDistance(Player.list[i]), Player.list[i].id]);
+        }
+      }
+      arr.map(it => arr2.push(it[0]));
+      let closestDist = Math.min(...arr2);
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i][0] === closestDist) {
+          self.targetPlayer = Player.list[arr[i][1]];
+        }
+      }
+    } else {
+      for (let i in Player.list) {
+        if (self.targetArtifact.owner === Player.list[i].id) {
+          self.targetPlayer = Player.list[i];
+          self.observation = 8;
+        }
       }
     }
-    arr.map(it => arr2.push(it[0]));
-    let closestDist = Math.min(...arr2);
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i][0] === closestDist) {
-        self.targetPlayer = Player.list[arr[i][1]];
-      }
-    }
+
     //....................................................
     let diffX = self.targetPlayer.x - self.x;
     let diffY = self.targetPlayer.y - self.y;
@@ -76,7 +94,11 @@ Enemy = function (enemyPack, x, y, map) {
 
   self.performAttack = function () {
     if (self.attackCount > self.attackRecharge && self.transformed === "no") {
-      Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: self.bulletType, lifespan: 100, map: self.map });
+      if (self.bulletType !== "LightningBolt") {
+        Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: self.bulletType, lifespan: 100, map: self.map });
+      } else {
+        Spell(self.targetPlayer.x, self.targetPlayer.y, self.bulletType, spellBook[self.bulletType], self.map);
+      }
 
       self.attackCount = 0;
       self.isAttacking = true;
@@ -139,6 +161,8 @@ Enemy = function (enemyPack, x, y, map) {
     }
     if (self.hp <= 0) {
       self.toRemove = true;
+    } else if (self.hp < self.hpMax) {
+      self.observation = 10
     }
     self.updateAim();
     self.updatePosition();
