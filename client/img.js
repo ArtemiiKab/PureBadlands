@@ -3,6 +3,8 @@ Img.player = new Image();
 Img.player.src = "/client/img/wizard.png";
 Img.corpse = new Image();
 Img.corpse.src = "/client/img/extra/body.png";
+Img.trapPyramid = new Image();
+Img.trapPyramid.src = "/client/img/extrasPyramid/trapPyramid.png"
 
 //.........................................PLAYER LOOKS...............................................
 //Human...............................................................................................
@@ -110,10 +112,26 @@ Img.skeletonRogue.src = "/client/img/enemiesPyramid/skeletonRogue.png";
 Img.skeletonRogueAttack = new Image();
 Img.skeletonRogueAttack.src = "/client/img/enemiesPyramid/skeletonRogueAttack.png";
 
+Img.skeletonNecromancer = new Image();
+Img.skeletonNecromancer.src = "/client/img/enemiesPyramid/skeletonNecromancer.png";
+Img.skeletonNecromancerAttack = new Image();
+Img.skeletonNecromancerAttack.src = "/client/img/enemiesPyramid/skeletonNecromancerAttack.png";
+
 Img.Mummy = new Image();
 Img.Mummy.src = "/client/img/enemiesPyramid/Mummy.png";
 Img.MummyAttack = new Image();
 Img.MummyAttack.src = "/client/img/enemiesPyramid/MummyAttack.png";
+
+
+Img.Medjai = new Image();
+Img.Medjai.src = "/client/img/enemiesPyramid/Medjai.png";
+Img.MedjaiAttack = new Image();
+Img.MedjaiAttack.src = "/client/img/enemiesPyramid/Medjai.png";
+
+Img.GiantEye = new Image();
+Img.GiantEye.src = "/client/img/enemiesPyramid/GiantEye.png";
+Img.GiantEyeAttack = new Image();
+Img.GiantEyeAttack.src = "/client/img/enemiesPyramid/GiantEye.png";
 
 Img.GoblinLightningCultist = new Image();
 Img.GoblinLightningCultist.src = "/client/img/enemiesPyramid/GoblinLightningCultist.png";

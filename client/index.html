@@ -412,7 +412,9 @@
     self.explosionframeCount = 0;
     self.isExplosion = false;
     self.type = initPack.type;
-    self.map = initPack.map
+    self.map = initPack.map;
+    self.width = initPack.width;
+    self.height = initPack.height
     self.draw = function () {
       if (self.x === null || self.y === null) {
         return;
@@ -420,8 +422,7 @@
       if (Player.list[selfId].map !== self.map) { return }
       let img = Img[self.type];
 
-      const width = img.width / 2;
-      const height = img.height / 2;
+
       let x = self.x - Player.list[selfId].x + WIDTH / 2;
       let y = self.y - Player.list[selfId].y + HEIGHT / 2;
       if (self.isExplosion) {
@@ -436,10 +437,10 @@
           0,
           frameWidth,
           frameHeight,
-          x - width / 2,
-          y - height / 2,
-          width,
-          height
+          x - self.width / 2,
+          y - self.height / 2,
+          self.width,
+          self.height
         );
       } else {
         ctx.drawImage(
@@ -448,10 +449,10 @@
           0,
           img.width,
           img.height,
-          x - width / 2,
-          y - height / 2,
-          width,
-          height
+          x - self.width / 2,
+          y - self.height / 2,
+          self.width,
+          self.height
         );
       }
     };
@@ -668,6 +669,7 @@
     self.img = Img[self.name];
 
     self.draw = function () {
+      if (self.map !== Player.list[selfId].map) { return }
       if (self.isTransformed === "transformed") { return }
 
       let x = self.x - Player.list[selfId].x + WIDTH / 2
@@ -696,6 +698,53 @@
     return self
   }
   const spellList = {}
+
+  //..........................................TRAPS...................................................//
+  //..................................................................................................//
+  //..................................................................................................//
+
+  const Trap = function (initPack) {
+    const self = {
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y,
+      map: initPack.map,
+      frameCount: initPack.frameCount
+    };
+
+    self.height = TILE_SIZE;
+    self.width = TILE_SIZE;
+    self.img = Img["trap" + self.map]
+
+    self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      let frameWidth = self.img.width / 6;
+      let walk = Math.floor(self.frameCount / 25);
+      ctx.drawImage(
+        self.img,
+        walk * frameWidth,
+        0,
+        frameWidth,
+        frameWidth,
+        x,
+        y,
+        TILE_SIZE,
+        TILE_SIZE
+      );
+
+    };
+
+    trapList[self.id] = self;
+    return self;
+  };
+  const trapList = {};
+
+
+
+
   //............................................SOCKETS................................................//
   //...................................................................................................//
   //...................................................................................................//
@@ -724,6 +773,9 @@
     }
     for (let i = 0; i < data.spell.length; i++) {
       new Spell(data.spell[i]);
+    }
+    for (let i = 0; i < data.trap.length; i++) {
+      new Trap(data.trap[i]);
     }
   });
 
@@ -872,6 +924,13 @@
 
         }
       }
+      for (let i = 0; i < data.trap.length; i++) {
+        const pack = data.trap[i];
+        const t = trapList[data.trap[i].id];
+        if (t) {
+          t.frameCount = pack.frameCount;
+        }
+      }
     }
   });
 
@@ -909,6 +968,10 @@
     }
     for (let i in corpseList) {
       corpseList[i].draw();
+    }
+
+    for (let i in trapList) {
+      trapList[i].draw();
     }
 
     for (let i in coffinList) {

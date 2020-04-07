@@ -41,13 +41,12 @@ Spell = function (x, y, name, power, map) {
                 let p = Player.list[i];
                 if (p.map.id === self.map.id && !p.isDead) {
 
-                    if (p.testCollision(self) && self.applies > 0) {
+                    if (self.spellFrameCount > 40 && p.testCollision(self) && self.applies > 0) {
                         if (self.power.stat !== "hp") {
-                            self.x = p.x - p.width / 2;
-                            self.y = p.y - p.height / 4;
+                            //  self.x = p.x - p.width / 2;
+                            //  self.y = p.y - p.height / 4;
                             self.applies -= 1;
                         }
-
                         self.applyMagicEffect(p);
                         self.target = p;
                     }
@@ -57,10 +56,10 @@ Spell = function (x, y, name, power, map) {
             for (let i in enemyList) {
                 let e = enemyList[i];
                 if (e.map.id === self.map.id) {
-                    if (e.testCollision(self) && self.applies > 0) {
+                    if (self.spellFrameCount > 40 && e.testCollision(self) && self.applies > 0) {
                         if (self.power.stat !== "hp") {
-                            self.x = e.x - e.width / 2;
-                            self.y = e.y - e.height / 4;
+                            //    self.x = e.x - e.width / 2;
+                            //    self.y = e.y - e.height / 4;
                             self.applies -= 1;
                         }
 

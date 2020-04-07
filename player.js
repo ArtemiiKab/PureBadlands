@@ -106,7 +106,7 @@ Player = function (param) {
   };
 
   self.shootBullet = function (angle) {
-    Bullet({ parent: self.id, angle: angle, x: self.x, y: self.y, bulletType: self.firstSkill, lifespan: 100, map: self.map });
+    Bullet({ parent: self.id, angle: angle, x: self.x, y: self.y, bulletType: bulletBook[self.firstSkill], map: self.map });
     // Spell(self.mouseX + self.x, self.mouseY + self.y, self.specialSkill, spellBook[self.specialSkill], self.map);
     self.pressingAttack = false;
     console.log(spellBook[self.specialSkill])

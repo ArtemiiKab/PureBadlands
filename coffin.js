@@ -1,6 +1,6 @@
 Coffin = function (colX, rowY, map) {
   const self = Entity();
-  let habitans = ["skeletonRogue", "Mummy"];
+  let habitans = ["skeletonRogue", "Mummy", "skeletonNecromancer"];
   self.id = Math.random();
   self.x = colX * TILE_SIZE + TILE_SIZE;
   self.y = rowY * TILE_SIZE + TILE_SIZE;

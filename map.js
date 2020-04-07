@@ -29,6 +29,17 @@ Maps = function (id, imgSrc, grid) {
   };
 
   self.generateTorches();
+  self.generateTraps = function () {
+    for (let i = 0; i < self.grid.length; i++) {
+      for (let i2 = 0; i2 < self.grid[0].length; i2++) {
+        if (self.grid[i][i2] === 5) {
+          new Trap(i2, i, true, self);
+        }
+      }
+    }
+  };
+
+  self.generateTraps()
   self.generateArtifacts = function () {
     for (let i = 0; i < self.grid.length; i++) {
       for (let i2 = 0; i2 < self.grid[0].length; i2++) {
@@ -42,10 +53,14 @@ Maps = function (id, imgSrc, grid) {
   self.generateArtifacts();
 
   self.generateEnemies = function () {
+    //0.1 GoblinCult; 
+    //0.2 GiantEye;
     for (let i = 0; i < self.grid.length; i++) {
       for (let i2 = 0; i2 < self.grid[0].length; i2++) {
         if (self.grid[i][i2] === 0.1) {
           new Enemy(enemyBook["GoblinLightningCultist"], i2 * TILE_SIZE, i * TILE_SIZE, self);
+        } else if (self.grid[i][i2] === 0.2) {
+          new Enemy(enemyBook["GiantEye"], i2 * TILE_SIZE, i * TILE_SIZE, self);
         }
       }
     }
@@ -265,7 +280,7 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
+    5,
     0,
     0,
     1,
@@ -279,7 +294,7 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
+    0.2,
     0,
     0,
     0,
@@ -310,9 +325,9 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
-    0,
-    0,
+    1,
+    1,
+    1,
     0,
     0,
     0,
@@ -358,9 +373,9 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
-    0,
-    0,
+    1,
+    1,
+    1,
     0,
     0,
     0,
@@ -406,9 +421,9 @@ Maps("Pyramid", "img/mapArenaPyramid.png", [
     0,
     0,
     0,
-    0,
-    0,
-    0,
+    1,
+    1,
+    1,
     0,
     0,
     0,

@@ -21,10 +21,12 @@ initPack = {
   coffin: [],
   enemy: [],
   artifact: [],
-  spell: []
+  spell: [],
+  trap: [],
 };
 
 removePack = { player: [], bullet: [], enemy: [], artifact: [], spell: [] };
+require("./bulletBook");
 require("./enemyBook");
 require("./spellBook");
 require("./entity");
@@ -32,6 +34,7 @@ require("./torch");
 require("./coffin");
 require("./artifact");
 require("./enemy");
+require("./trap");
 require("./map");
 
 require("./player");
@@ -95,7 +98,8 @@ Player.onConnect = function (socket, map) {
     coffin: Coffin.getAllInitPack(),
     enemy: Enemy.getAllInitPack(),
     artifact: Artifact.getAllInitPack(),
-    spell: Spell.getAllInitPack()
+    spell: Spell.getAllInitPack(),
+    trap: Trap.getAllInitPack()
   });
 };
 
@@ -207,7 +211,8 @@ setInterval(function () {
     coffin: Coffin.superUpdate(),
     enemy: Enemy.superUpdate(),
     artifact: Artifact.superUpdate(),
-    spell: Spell.superUpdate()
+    spell: Spell.superUpdate(),
+    trap: Trap.superUpdate(),
 
   };
 
@@ -224,6 +229,7 @@ setInterval(function () {
   initPack.coffin = [];
   initPack.artifact = [];
   initPack.spell = [];
+  initPack.trap = [];
   removePack.player = [];
   removePack.bullet = [];
   removePack.enemy = [];

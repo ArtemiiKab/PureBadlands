@@ -3,15 +3,20 @@ Bullet = function (param) {
   self.purpose = "bullet";
   self.id = Math.random() * 200;
   self.angle = param.angle;
-  self.spdX = Math.cos((param.angle / 180) * Math.PI) * 25;
-  self.spdY = Math.sin((param.angle / 180) * Math.PI) * 25;
+  self.speed = param.bulletType.speed
+  self.spdX = Math.cos((param.angle / 180) * Math.PI) * self.speed;
+  self.spdY = Math.sin((param.angle / 180) * Math.PI) * self.speed;
   self.parent = param.parent;
   self.explosionframeCount = 0;
+  self.width = param.bulletType.width;
+  self.height = param.bulletType.height;
   self.isExplosion = false;
   self.timer = 0;
   self.map = param.map;
-  self.type = param.bulletType;
-  self.lifespan = param.lifespan
+  self.type = param.bulletType.name;
+  self.lifeSpan = param.bulletType.lifeSpan;
+  self.damage = param.bulletType.damage;
+  self.damageType = param.bulletType.damageType
   self.toRemove = false;
   const super_update = self.update;
   self.update = function () {
@@ -26,8 +31,8 @@ Bullet = function (param) {
 
       if (self.map.id === p.map.id) {
         if (!p.isDead) {
-          if (self.getDistance(p) < 32 && self.parent !== p.id) {
-            p.hp -= 1;
+          if (self.testCollision(p) && self.parent !== p.id) {
+            p.hp -= self.damage;
 
             if (p.hp <= 0) {
               const shooter = Player.list[self.parent];
@@ -44,8 +49,8 @@ Bullet = function (param) {
     for (let i in enemyList) {
       const e = enemyList[i];
       if (self.map.id === e.map.id) {
-        if (self.getDistance(e) < 32 && self.parent !== e.id) {
-          e.hp -= 1;
+        if (self.testCollision(e) && self.parent !== e.id) {
+          e.hp -= self.damage;
           if (e.hp <= 0) {
             e.toRemove = true;
           }
@@ -61,7 +66,9 @@ Bullet = function (param) {
       x: self.x,
       y: self.y,
       type: self.type,
-      map: self.map.id
+      map: self.map.id,
+      width: self.width,
+      height: self.height,
     };
   };
 

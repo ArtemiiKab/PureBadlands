@@ -13,7 +13,7 @@ Enemy = function (enemyPack, x, y, map) {
   self.y = y;
   self.map = map;
 
-  self.attackRecharge = 30;
+  self.attackRecharge = enemyPack.attackRecharge;
   self.aimAngle = 0;
   self.toRemove = false;
   self.animeFrameCount = 0;
@@ -94,8 +94,8 @@ Enemy = function (enemyPack, x, y, map) {
 
   self.performAttack = function () {
     if (self.attackCount > self.attackRecharge && self.transformed === "no") {
-      if (self.bulletType !== "LightningBolt") {
-        Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: self.bulletType, lifespan: 100, map: self.map });
+      if (bulletBook[self.bulletType] !== undefined) {
+        Bullet({ parent: self.id, angle: self.aimAngle, x: self.x, y: self.y, bulletType: bulletBook[self.bulletType], map: self.map });
       } else {
         Spell(self.targetPlayer.x, self.targetPlayer.y, self.bulletType, spellBook[self.bulletType], self.map);
       }
