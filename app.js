@@ -23,6 +23,7 @@ initPack = {
   artifact: [],
   spell: [],
   trap: [],
+  trigger: []
 };
 
 removePack = { player: [], bullet: [], enemy: [], artifact: [], spell: [] };
@@ -35,6 +36,7 @@ require("./coffin");
 require("./artifact");
 require("./enemy");
 require("./trap");
+require("./trigger");
 require("./map");
 
 require("./player");
@@ -99,7 +101,8 @@ Player.onConnect = function (socket, map) {
     enemy: Enemy.getAllInitPack(),
     artifact: Artifact.getAllInitPack(),
     spell: Spell.getAllInitPack(),
-    trap: Trap.getAllInitPack()
+    trap: Trap.getAllInitPack(),
+    trigger: Trigger.getAllInitPack()
   });
 };
 
@@ -213,6 +216,7 @@ setInterval(function () {
     artifact: Artifact.superUpdate(),
     spell: Spell.superUpdate(),
     trap: Trap.superUpdate(),
+    trigger: Trigger.superUpdate(),
 
   };
 
@@ -230,6 +234,7 @@ setInterval(function () {
   initPack.artifact = [];
   initPack.spell = [];
   initPack.trap = [];
+  initPack.trigger = [];
   removePack.player = [];
   removePack.bullet = [];
   removePack.enemy = [];

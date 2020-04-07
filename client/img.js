@@ -4,7 +4,9 @@ Img.player.src = "/client/img/wizard.png";
 Img.corpse = new Image();
 Img.corpse.src = "/client/img/extra/body.png";
 Img.trapPyramid = new Image();
-Img.trapPyramid.src = "/client/img/extrasPyramid/trapPyramid.png"
+Img.trapPyramid.src = "/client/img/extrasPyramid/trapPyramid.png";
+Img.triggerPyramid = new Image();
+Img.triggerPyramid.src = "/client/img/extrasPyramid/triggerPyramid.png"
 
 //.........................................PLAYER LOOKS...............................................
 //Human...............................................................................................

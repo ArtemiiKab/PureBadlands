@@ -742,6 +742,49 @@
   };
   const trapList = {};
 
+  //..........................................TRIGGERS...................................................//
+  //..................................................................................................//
+  //..................................................................................................//
+
+  const Trigger = function (initPack) {
+    const self = {
+      id: initPack.id,
+      x: initPack.x,
+      y: initPack.y,
+      map: initPack.map,
+      frameCount: initPack.frameCount
+    };
+
+    self.height = TILE_SIZE;
+    self.width = TILE_SIZE;
+    self.img = Img["trigger" + self.map]
+
+    self.draw = function () {
+      if (Player.list[selfId].map !== self.map) { return }
+      let x = self.x - Player.list[selfId].x + WIDTH / 2;
+      let y = self.y - Player.list[selfId].y + HEIGHT / 2;
+
+      let frameWidth = self.img.width / 3;
+      let walk = Math.floor(self.frameCount / 25);
+      ctx.drawImage(
+        self.img,
+        walk * frameWidth,
+        0,
+        frameWidth,
+        frameWidth,
+        x,
+        y,
+        TILE_SIZE,
+        TILE_SIZE
+      );
+
+    };
+
+    triggerList[self.id] = self;
+    return self;
+  };
+  const triggerList = {};
+
 
 
 
@@ -776,6 +819,9 @@
     }
     for (let i = 0; i < data.trap.length; i++) {
       new Trap(data.trap[i]);
+    }
+    for (let i = 0; i < data.trigger.length; i++) {
+      new Trigger(data.trigger[i]);
     }
   });
 
@@ -931,6 +977,13 @@
           t.frameCount = pack.frameCount;
         }
       }
+      for (let i = 0; i < data.trigger.length; i++) {
+        const pack = data.trigger[i];
+        const tr = triggerList[data.trigger[i].id];
+        if (tr) {
+          tr.frameCount = pack.frameCount;
+        }
+      }
     }
   });
 
@@ -972,6 +1025,10 @@
 
     for (let i in trapList) {
       trapList[i].draw();
+    }
+
+    for (let i in triggerList) {
+      triggerList[i].draw();
     }
 
     for (let i in coffinList) {

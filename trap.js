@@ -9,7 +9,7 @@ Trap = function (x, y, isTriggered, map) {
     self.height = TILE_SIZE;
     self.frameCount = 0;
     self.isTriggered = isTriggered;
-    self.damage = 1;
+    self.damage = 3;
     if (self.isTriggered) {
         self.frameCount = 125;
     }
@@ -37,7 +37,10 @@ Trap = function (x, y, isTriggered, map) {
         for (let i in enemyList) {
             let e = enemyList[i];
             if (e.map.id === self.map.id && self.frameCount > 110 && e.testCollision({ x: self.x + e.width / 3, y: self.y + 4, width: self.width - TILE_SIZE / 2, height: self.height - e.height })) {
-                e.hp -= self.damage;
+                if (!e.isFlying) {
+                    e.hp -= self.damage;
+                }
+
             }
         }
 

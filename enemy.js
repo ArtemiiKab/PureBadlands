@@ -12,6 +12,12 @@ Enemy = function (enemyPack, x, y, map) {
   self.x = x;
   self.y = y;
   self.map = map;
+  if (enemyPack.isFlying !== undefined) {
+    self.isFlying = true;
+  }
+  if (enemyPack.immune !== undefined) {
+    self.immune = enemyPack.immune
+  }
 
   self.attackRecharge = enemyPack.attackRecharge;
   self.aimAngle = 0;

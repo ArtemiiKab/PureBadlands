@@ -5,7 +5,9 @@ Entity = function (param) {
     spdX: 0,
     spdY: 0,
     id: "",
-    idDead: false
+    idDead: false,
+    isFlying: false,
+    immune: false
   };
 
   if (param) {

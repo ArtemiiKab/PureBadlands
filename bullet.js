@@ -50,7 +50,8 @@ Bullet = function (param) {
       const e = enemyList[i];
       if (self.map.id === e.map.id) {
         if (self.testCollision(e) && self.parent !== e.id) {
-          e.hp -= self.damage;
+          if (e.immune !== self.damageType)
+            e.hp -= self.damage;
           if (e.hp <= 0) {
             e.toRemove = true;
           }
